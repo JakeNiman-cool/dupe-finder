@@ -1,9 +1,9 @@
-exports.handler = async (event, context) => {
+export default async function handler(req, res) {
   try {
-    const query = event.queryStringParameters?.query || 'trending deals';
-    console.log(`[Search API] Processing search query: "${query}"`);
+    const query = req.query.query || 'trending deals';
+    console.log(`[Vercel Search API] Processing search query: "${query}"`);
 
-    // Clean mock results representing actual budget marketplace items (eBay & Vinted)
+    // Mock/Fallback results structured for budget marketplaces (eBay, Vinted)
     const mockShoppingResults = [
       {
         title: `${query} - Great Condition Thrift Find`,
@@ -28,27 +28,15 @@ exports.handler = async (event, context) => {
       }
     ];
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        success: true,
-        shopping: mockShoppingResults
-      })
-    };
+    return res.status(200).json({
+      success: true,
+      shopping: mockShoppingResults
+    });
   } catch (error) {
-    console.error("[Search API Error]:", error);
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        success: true,
-        shopping: []
-      })
-    };
+    console.error("[Vercel Search API Error]:", error);
+    return res.status(200).json({
+      success: false,
+      shopping: []
+    });
   }
-};
+}
