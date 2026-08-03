@@ -6,16 +6,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Keep search clean to fetch all major retail results directly from Google Shopping
-    const searchQuery = `${query} price deal`;
-
+    // Send the user's raw query directly so Serper returns all major stores (Amazon, Wayfair, Target, etc.)
     const response = await fetch(`https://google.serper.dev/shopping`, {
       method: 'POST',
       headers: {
         'X-API-KEY': process.env.SERPAPI_KEY,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ q: searchQuery })
+      body: JSON.stringify({ q: query })
     });
 
     const data = await response.json();
