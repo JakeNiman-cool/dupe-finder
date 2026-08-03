@@ -8,67 +8,73 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let allItems = [];
   let currentFilter = 'all';
-  let currentSort = 'low-high'; // default sort
+  let currentSort = 'low-high';
 
+  // Helper function to execute searches or trending loads
+  async function performSearch(queryToSearch) {
+    if (!queryToSearch) return;
+
+    if (loadingSpinner) loadingSpinner.classList.remove("hidden");
+    if (noResults) noResults.classList.add("hidden");
+    if (resultsGrid) resultsGrid.innerHTML = "";
+    if (filterContainer) filterContainer.classList.add("hidden");
+
+    try {
+      const response = await fetch(`/api/search?query=${encodeURIComponent(queryToSearch)}`);
+      const data = await response.json();
+
+      if (loadingSpinner) loadingSpinner.classList.add("hidden");
+
+      allItems = data.shopping || [];
+
+      function extractPrice(priceStr) {
+        if (!priceStr) return Infinity;
+        const match = priceStr.replace(/[^0-9.]/g, '').match(/[\d.]+/);
+        return match ? parseFloat(match[0]) : Infinity;
+      }
+
+      // Filter out high-end luxury resale platforms to keep it budget-friendly
+      const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods', '1stdibs'];
+      allItems = allItems.filter(item => {
+        const sourceName = (item.source || '').toLowerCase();
+        return !excludedSources.some(exc => sourceName.includes(exc));
+      });
+
+      if (allItems.length === 0) {
+        if (noResults) noResults.classList.remove("hidden");
+      } else {
+        if (filterContainer) {
+          filterContainer.classList.remove("hidden");
+          injectSortDropdown();
+        }
+        applyFilter(currentFilter, currentSort);
+      }
+    } catch (error) {
+      console.error("Search failed:", error);
+      if (loadingSpinner) loadingSpinner.classList.add("hidden");
+      if (noResults) noResults.classList.remove("hidden");
+    }
+  }
+
+  // Handle standard search form submission
   if (searchForm) {
     searchForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const rawQuery = searchInput.value.trim();
-      
       if (!rawQuery) return;
-
-      if (loadingSpinner) loadingSpinner.classList.remove("hidden");
-      if (noResults) noResults.classList.add("hidden");
-      if (resultsGrid) resultsGrid.innerHTML = "";
-      if (filterContainer) filterContainer.classList.add("hidden");
-
-      try {
-        let query = rawQuery;
-        const lowerQ = rawQuery.toLowerCase();
-        
-        // Handle specific item intents or ensure marketplace terms are included to catch eBay/Vinted results
-        if (lowerQ.includes('hand couch') || lowerQ.includes('hand chair')) {
-          query = 'Pedro Friedeberg wooden hand chair sculpture ebay vinted';
-        } else if (!lowerQ.includes('ebay') && !lowerQ.includes('vinted')) {
-          query = `${rawQuery} site:ebay.co.uk OR site:vinted.co.uk OR ${rawQuery}`;
-        }
-
-        const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
-        const data = await response.json();
-
-        if (loadingSpinner) loadingSpinner.classList.add("hidden");
-
-        allItems = data.shopping || [];
-
-        function extractPrice(priceStr) {
-          if (!priceStr) return Infinity;
-          const match = priceStr.replace(/[^0-9.]/g, '').match(/[\d.]+/);
-          return match ? parseFloat(match[0]) : Infinity;
-        }
-
-        // Filter out expensive luxury resale platforms
-        const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods', '1stdibs'];
-        allItems = allItems.filter(item => {
-          const sourceName = (item.source || '').toLowerCase();
-          return !excludedSources.some(exc => sourceName.includes(exc));
-        });
-
-        if (allItems.length === 0) {
-          if (noResults) noResults.classList.remove("hidden");
-        } else {
-          if (filterContainer) {
-            filterContainer.classList.remove("hidden");
-            injectSortDropdown(); // add sort dropdown to the sidebar UI
-          }
-          applyFilter(currentFilter, currentSort);
-        }
-      } catch (error) {
-        console.error("Search failed:", error);
-        if (loadingSpinner) loadingSpinner.classList.add("hidden");
-        if (noResults) noResults.classList.add("hidden");
-      }
+      await performSearch(rawQuery);
     });
   }
+
+  // Bind any "Trending" buttons or links on your page automatically
+  document.querySelectorAll('.trending-trigger, [data-trending]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const trendQuery = btn.getAttribute('data-query') || 'trending deals bargains';
+      if (searchInput) searchInput.value = trendQuery;
+      performSearch(trendQuery);
+    });
+  });
 
   // Inject Sort dropdown dynamically into the sidebar filter container
   function injectSortDropdown() {
@@ -80,8 +86,8 @@ document.addEventListener("DOMContentLoaded", () => {
       sortWrapper.innerHTML = `
         <h4 class="text-xl text-slate-900 mb-3">🔄 Sort Order</h4>
         <select id="sort-select" onchange="window.changeSort(this.value)" class="w-full p-3 bg-white border-2 border-slate-900 rounded-xl font-bold text-slate-900 shadow-[2px_2px_0px_#1e293b] focus:outline-none">
-          <option value="low-high">Price: Low to High 📈</option>
-          <option value="high-low">Price: High to Low 📉</option>
+          <option value="low-high" ${currentSort === 'low-high' ? 'selected' : ''}>Price: Low to High 📈</option>
+          <option value="high-low" ${currentSort === 'high-low' ? 'selected' : ''}>Price: High to Low 📉</option>
         </select>
       `;
       filterContainer.appendChild(sortWrapper);
@@ -118,7 +124,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return m ? parseFloat(m[0]) : Infinity;
     };
 
-    // Apply Low to High or High to Low sorting
     filtered.sort((a, b) => {
       const priceA = getNum(a.price);
       const priceB = getNum(b.price);
