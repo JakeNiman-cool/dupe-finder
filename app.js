@@ -24,17 +24,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let items = data.shopping || [];
 
-        // SMART SORTING: Prioritize items that have both a price and an image
+        // Helper function to extract a clean number from price strings like "$45.99" or "£20"
+        function extractPrice(priceStr) {
+          if (!priceStr) return Infinity; // Put items without prices at the very bottom
+          const match = priceStr.replace(/,/g, '').match(/[\d.]+/);
+          return match ? parseFloat(match[0]) : Infinity;
+        }
+
+        // SMART CHEAP DEAL SORTING: Prioritize items with images and sort by lowest price first!
         items.sort((a, b) => {
           const hasImageA = (a.imageUrl || a.thumbnail || a.image || a.photo) ? 1 : 0;
           const hasImageB = (b.imageUrl || b.thumbnail || b.image || b.photo) ? 1 : 0;
-          const hasPriceA = a.price ? 1 : 0;
-          const hasPriceB = b.price ? 1 : 0;
 
-          const scoreA = hasImageA + hasPriceA;
-          const scoreB = hasImageB + hasPriceB;
+          // If one has an image and the other doesn't, favor the one with an image
+          if (hasImageA !== hasImageB) {
+            return hasImageB - hasImageA;
+          }
 
-          return scoreB - scoreA;
+          // Otherwise, sort by cheapest numerical price first
+          const priceA = extractPrice(a.price);
+          const priceB = extractPrice(b.price);
+
+          return priceA - priceB;
         });
 
         if (items.length === 0) {
@@ -60,8 +71,8 @@ document.addEventListener("DOMContentLoaded", () => {
       
       const imageUrl = item.imageUrl || item.thumbnail || item.image || item.photo;
 
-      // Add a special badge to the top item as the Best Deal!
-      const bestDealBadge = index === 0 ? `
+      // The absolute cheapest valid item gets the Best Deal badge!
+      const bestDealBadge = index === 0 && item.price ? `
         <div class="absolute -top-3 -right-2 bg-pink-500 text-white text-xs font-black px-3 py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
           🔥 (BEST DEAL)
         </div>
