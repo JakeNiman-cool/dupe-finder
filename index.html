@@ -55,22 +55,30 @@
   </header>
 
   <main class="max-w-7xl mx-auto px-4">
-    <!-- Search Bar -->
-    <form id="search-form" class="max-w-3xl mx-auto mb-10 flex flex-col sm:flex-row gap-3">
-      <input 
-        type="text" 
-        id="search-input"
-        placeholder="Search for hand chair, bleu de chanel, nike sneakers..." 
-        class="cartoony-input flex-1 px-5 py-4 rounded-2xl text-lg font-bold bg-white focus:outline-none focus:ring-4 focus:ring-yellow-300"
-        required
-      />
-      <button 
-        type="submit" 
-        class="cartoony-button bg-pink-500 hover:bg-pink-600 text-white font-black text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-2"
-      >
-        <span>Search Deals</span> 🔍
-      </button>
-    </form>
+    <!-- Search Bar Container -->
+    <div class="max-w-3xl mx-auto mb-10">
+      <form id="search-form" class="flex flex-col sm:flex-row gap-3">
+        <input 
+          type="text" 
+          id="search-input"
+          placeholder="Search for hand chair, bleu de chanel, nike sneakers..." 
+          class="cartoony-input flex-1 px-5 py-4 rounded-2xl text-lg font-bold bg-white focus:outline-none focus:ring-4 focus:ring-yellow-300"
+          required
+        />
+        <button 
+          type="submit" 
+          class="cartoony-button bg-pink-500 hover:bg-pink-600 text-white font-black text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-2"
+        >
+          <span>Search Deals</span> 🔍
+        </button>
+      </form>
+
+      <!-- Old Searches Pill Container -->
+      <div id="recent-searches" class="mt-3 flex flex-wrap items-center gap-2 text-sm font-bold">
+        <span class="text-slate-500 text-xs font-black uppercase">Recent:</span>
+        <div id="recent-tags" class="flex flex-wrap gap-2"></div>
+      </div>
+    </div>
 
     <!-- Main Grid: Sidebar + Results -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -82,10 +90,14 @@
         </h2>
 
         <div class="space-y-3">
-          <!-- ORIGINAL CATEGORY BUTTONS -->
           <button data-filter="all" class="w-full text-left cartoony-button bg-blue-500 text-white font-black px-4 py-3 rounded-2xl flex items-center gap-2 ring-4 ring-slate-900 scale-105">
             <span class="w-5 h-5 rounded-full bg-white border-2 border-slate-900 flex items-center justify-center text-xs text-slate-900">✓</span>
             All Deals
+          </button>
+
+          <button data-filter="trending" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
+            🔥 Trending Now
           </button>
 
           <button data-filter="low-to-high" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
