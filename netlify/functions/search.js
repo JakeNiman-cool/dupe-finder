@@ -11,29 +11,21 @@ exports.handler = async function (event, context) {
   try {
     const apiKey = process.env.SERPAPI_KEY;
 
-    // Use native fetch to hit SerpApi with Google Shopping parameters
     const response = await fetch(
-      `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(query)}&api_key=${apiKey}&gl=us&hl=en&direct_link=true`
+      `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(query)}&api_key=${apiKey}`
     );
-
-    if (!response.ok) {
-      throw new Error(`SerpApi responded with status: ${response.status}`);
-    }
 
     const data = await response.json();
     const shoppingResults = data.shopping_results || [];
 
-    // Filter out irrelevant items lacking titles or prices
-    const cleanedResults = shoppingResults
-      .filter(item => item.title && item.price)
-      .map(item => ({
-        title: item.title,
-        price: item.extracted_price || item.price,
-        formattedPrice: item.price,
-        link: item.link,
-        image: item.thumbnail,
-        source: item.source || 'Store',
-      }));
+    const cleanedResults = shoppingResults.map(item => ({
+      title: item.title,
+      price: item.extracted_price || item.price,
+      formattedPrice: item.price,
+      link: item.link,
+      image: item.thumbnail,
+      source: item.source || 'Store'
+    }));
 
     return {
       statusCode: 200,
