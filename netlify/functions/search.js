@@ -1,63 +1,89 @@
 exports.handler = async function (event, context) {
+  // Extract query parameter from request (e.g., /api/search?q=Nike)
   const query = event.queryStringParameters ? event.queryStringParameters.q : null;
 
   if (!query) {
     return {
       statusCode: 400,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
       body: JSON.stringify({ error: 'Query parameter "q" is required' }),
     };
   }
 
   try {
+    // Reads your new Serper key from Netlify Environment Variables
     const apiKey = process.env.SERPAPI_KEY;
 
     if (!apiKey) {
-      console.error('SERPAPI_KEY is missing from environment variables');
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: 'SERPAPI_KEY is missing on Netlify' }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({ error: 'API key missing in Netlify environment variables' }),
       };
     }
 
-    // Direct Google Shopping Request via SerpApi
-    const response = await fetch(
-      `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(query)}&api_key=${apiKey}`
-    );
+    // Call Serper.dev Google Shopping Endpoint
+    const response = await fetch('https://google.serper.dev/shopping', {
+      method: 'POST',
+      headers: {
+        'X-API-KEY': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        q: query,
+        gl: 'us',
+        hl: 'en',
+      }),
+    });
 
     const data = await response.json();
 
-    // Check if SerpApi returned an explicit account or request error
-    if (data.error) {
-      console.error('SerpApi returned an error:', data.error);
+    if (!response.ok || data.message) {
       return {
-        statusCode: 400,
-        body: JSON.stringify({ error: `SerpApi Error: ${data.error}` }),
+        statusCode: response.status || 400,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: JSON.stringify({ error: data.message || 'Failed to fetch from Serper API' }),
       };
     }
 
-    const shoppingResults = data.shopping_results || [];
+    // Parse shopping results returned by Serper
+    const shoppingResults = data.shopping || [];
 
+    // Map and normalize fields so frontend app.js can display them smoothly
     const cleanedResults = shoppingResults.map(item => ({
-      title: item.title || 'Product Alternative',
-      price: item.extracted_price || item.price || 'Check Store',
-      formattedPrice: item.price || (item.extracted_price ? `$${item.extracted_price}` : 'See Store'),
+      title: item.title || 'Alternative Product',
+      price: item.price ? (typeof item.price === 'number' ? `$${item.price.toFixed(2)}` : item.price) : 'Check Price',
+      formattedPrice: item.price ? (typeof item.price === 'number' ? `$${item.price.toFixed(2)}` : item.price) : 'Check Price',
       link: item.link || '#',
-      image: item.thumbnail || item.image || 'https://via.placeholder.com/150',
-      source: item.source || 'Store'
+      image: item.imageUrl || 'https://via.placeholder.com/200?text=No+Image',
+      source: item.source || 'Online Store',
     }));
 
     return {
       statusCode: 200,
       headers: {
         'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
       },
       body: JSON.stringify({ results: cleanedResults }),
     };
   } catch (error) {
-    console.error('Function Execution Error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: error.message || 'Failed to fetch search results' }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
+      body: JSON.stringify({ error: error.message || 'Internal Server Error' }),
     };
   }
 };
