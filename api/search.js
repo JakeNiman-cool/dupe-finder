@@ -6,18 +6,44 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Send the user's raw query directly so Serper returns all major stores (Amazon, Wayfair, Target, etc.)
-    const response = await fetch(`https://google.serper.dev/shopping`, {
-      method: 'POST',
-      headers: {
-        'X-API-KEY': process.env.SERPAPI_KEY,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ q: query })
+    const serperHeaders = {
+      'X-API-KEY': process.env.SERPAPI_KEY,
+      'Content-Type': 'application/json'
+    };
+
+    // Run parallel requests: standard query + luxury/high-end query
+    const [standardRes, luxuryRes] = await Promise.all([
+      fetch(`https://google.serper.dev/shopping`, {
+        method: 'POST',
+        headers: serperHeaders,
+        body: JSON.stringify({ q: query, num: 100 })
+      }),
+      fetch(`https://google.serper.dev/shopping`, {
+        method: 'POST',
+        headers: serperHeaders,
+        body: JSON.stringify({ q: `${query} luxury designer high end authentic`, num: 100 })
+      })
+    ]);
+
+    const standardData = await standardRes.json();
+    const luxuryData = await luxuryRes.json();
+
+    const standardItems = standardData.shopping || [];
+    const luxuryItems = luxuryData.shopping || [];
+
+    // Combine both result sets
+    const combined = [...standardItems, ...luxuryItems];
+
+    // Remove duplicate items by link or title
+    const seenLinks = new Set();
+    const uniqueItems = combined.filter(item => {
+      const identifier = item.link || item.title;
+      if (seenLinks.has(identifier)) return false;
+      seenLinks.add(identifier);
+      return true;
     });
 
-    const data = await response.json();
-    return res.status(200).json(data);
+    return res.status(200).json({ shopping: uniqueItems });
   } catch (error) {
     console.error("[Search API Error]:", error);
     return res.status(500).json({ error: 'Failed to fetch deals' });
