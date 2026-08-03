@@ -34,33 +34,50 @@
 <body class="bg-pink-50 min-h-screen font-sans text-slate-900 pb-16">
 
   <!-- Header -->
-  <header class="bg-white border-b-4 border-slate-900 py-4 mb-8 px-6">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+  <header class="bg-white border-b-4 border-slate-900 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
       <div class="flex items-center gap-2">
         <span class="text-3xl">⭐</span>
         <h1 class="text-3xl font-black text-pink-600 tracking-tight">DupeSpotter</h1>
       </div>
-      <div class="flex items-center gap-6 font-bold text-slate-700">
+      
+      <!-- Top Navigation Links (Like Vinted Header) -->
+      <div class="flex items-center gap-6 font-bold text-slate-700 text-sm">
         <a href="#" class="hover:text-pink-600">Features</a>
         <a href="#" class="hover:text-pink-600">About</a>
         <a href="#" class="hover:text-pink-600">Blog</a>
         <a href="#" class="hover:text-pink-600">API</a>
         <a href="#" class="hover:text-pink-600">Contact</a>
       </div>
-      <button class="cartoony-button bg-yellow-300 font-bold px-4 py-2 rounded-2xl flex items-center gap-2">
+
+      <button class="cartoony-button bg-yellow-300 font-bold px-4 py-2 rounded-2xl flex items-center gap-2 text-sm">
         <span>🎨 dbestguy productions</span>
       </button>
     </div>
+
+    <!-- Vinted-Style Sub-Header Category Bar -->
+    <div class="border-t-2 border-slate-200 bg-slate-50 py-2.5 px-6">
+      <div id="vinted-categories" class="max-w-7xl mx-auto flex items-center justify-center sm:justify-start gap-6 font-black text-slate-700 text-sm overflow-x-auto whitespace-nowrap">
+        <button data-gender="women" class="hover:text-pink-600 transition-colors">Women</button>
+        <button data-gender="men" class="hover:text-pink-600 transition-colors">Men</button>
+        <button data-category="designer" class="hover:text-pink-600 transition-colors">Designer</button>
+        <button data-gender="kids" class="hover:text-pink-600 transition-colors">Kids</button>
+        <button data-category="shoes" class="hover:text-pink-600 transition-colors">Shoes</button>
+        <button data-category="furniture" class="hover:text-pink-600 transition-colors">Home & Furniture</button>
+        <button data-category="tech" class="hover:text-pink-600 transition-colors">Electronics</button>
+        <button data-category="sports" class="hover:text-pink-600 transition-colors">Sports & Collectibles</button>
+      </div>
+    </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4">
-    <!-- Search Bar & Fine-Tune Inputs -->
+  <main class="max-w-7xl mx-auto px-4 mt-8">
+    <!-- Search Bar Container -->
     <div class="max-w-3xl mx-auto mb-10 space-y-4">
       <form id="search-form" class="flex flex-col sm:flex-row gap-3">
         <input 
           type="text" 
           id="search-input"
-          placeholder="Search for shoes, jacket, sofa, airpods..." 
+          placeholder="Search for Nike Panda Dunks, Airpods, Leather Couch..." 
           class="cartoony-input flex-1 px-5 py-4 rounded-2xl text-lg font-bold bg-white focus:outline-none focus:ring-4 focus:ring-yellow-300"
           required
         />
@@ -72,47 +89,31 @@
         </button>
       </form>
 
-      <!-- Category Shortcuts -->
-      <div id="category-pills" class="flex flex-wrap gap-2 justify-center">
-        <button data-category="clothing" class="cartoony-button bg-yellow-200 hover:bg-yellow-300 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
-          👕 Clothing
-        </button>
-        <button data-category="shoes" class="cartoony-button bg-pink-200 hover:bg-pink-300 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
-          👟 Shoes
-        </button>
-        <button data-category="furniture" class="cartoony-button bg-purple-200 hover:bg-purple-300 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
-          🛋️ Furniture
-        </button>
-        <button data-category="tech" class="cartoony-button bg-blue-200 hover:bg-blue-300 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
-          🎧 Tech / Electronics
-        </button>
-      </div>
-
-      <!-- Gender & Size Selectors -->
-      <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-        <div class="flex items-center gap-1 font-bold text-sm">
+      <!-- Optional Filters for Size and Gender -->
+      <div class="flex flex-wrap items-center justify-center gap-4 text-sm font-bold pt-1">
+        <div class="flex items-center gap-2">
           <label for="gender-select">Gender:</label>
           <select id="gender-select" class="cartoony-input bg-white px-3 py-1.5 rounded-xl text-sm font-bold">
             <option value="">Any</option>
-            <option value="men">Men's / Male</option>
-            <option value="women">Women's / Female</option>
-            <option value="unisex">Unisex</option>
+            <option value="women">Women's</option>
+            <option value="men">Men's</option>
+            <option value="kids">Kids</option>
           </select>
         </div>
 
-        <div class="flex items-center gap-1 font-bold text-sm">
+        <div class="flex items-center gap-2">
           <label for="size-input">Size:</label>
           <input 
             type="text" 
             id="size-input" 
-            placeholder="e.g. 10, M, L" 
-            class="cartoony-input bg-white px-3 py-1.5 rounded-xl text-sm font-bold w-28" 
+            placeholder="e.g. 5.5, UK 6, M" 
+            class="cartoony-input bg-white px-3 py-1.5 rounded-xl text-sm font-bold w-32" 
           />
         </div>
       </div>
 
       <!-- Recent Searches -->
-      <div id="recent-searches" class="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm font-bold">
+      <div id="recent-searches" class="flex flex-wrap items-center justify-center gap-2 text-sm font-bold">
         <span class="text-slate-500 text-xs font-black uppercase">Recent:</span>
         <div id="recent-tags" class="flex flex-wrap gap-2"></div>
       </div>
@@ -174,7 +175,7 @@
       <section class="md:col-span-3">
         <div id="loading-spinner" class="hidden text-center py-16">
           <div class="inline-block animate-spin text-5xl mb-3">🌀</div>
-          <p class="text-xl font-black text-slate-700">Hunting down cheap $5 eBay deals & major store listings...</p>
+          <p class="text-xl font-black text-slate-700">Hunting down eBay listings & store deals...</p>
         </div>
 
         <div id="no-results" class="hidden text-center py-16 bg-white rounded-3xl cartoony-card max-w-md mx-auto">
