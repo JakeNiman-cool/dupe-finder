@@ -4,6 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const loadingSpinner = document.getElementById("loading-spinner");
   const noResults = document.getElementById("no-results");
   const resultsGrid = document.getElementById("results-grid");
+  const filterContainer = document.getElementById("filter-container");
+
+  let allItems = [];
+  let currentFilter = 'all';
 
   if (searchForm) {
     searchForm.addEventListener("submit", async (e) => {
@@ -15,9 +19,9 @@ document.addEventListener("DOMContentLoaded", () => {
       if (loadingSpinner) loadingSpinner.classList.remove("hidden");
       if (noResults) noResults.classList.add("hidden");
       if (resultsGrid) resultsGrid.innerHTML = "";
+      if (filterContainer) filterContainer.classList.add("hidden");
 
       try {
-        // Smart query formatting for specific items like "hand couch" / "hand chair"
         let query = rawQuery;
         const lowerQ = rawQuery.toLowerCase();
         if (lowerQ.includes('hand couch') || lowerQ.includes('hand chair')) {
@@ -29,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (loadingSpinner) loadingSpinner.classList.add("hidden");
 
-        let items = data.shopping || [];
+        allItems = data.shopping || [];
 
         function extractPrice(priceStr) {
           if (!priceStr) return Infinity;
@@ -39,20 +43,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Filter out expensive resale/luxury platforms to keep things truly cheap
         const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods', '1stdibs'];
-        items = items.filter(item => {
+        allItems = allItems.filter(item => {
           const sourceName = (item.source || '').toLowerCase();
           return !excludedSources.some(exc => sourceName.includes(exc));
         });
 
         // Strict sort: Lowest price first
-        items.sort((a, b) => {
+        allItems.sort((a, b) => {
           return extractPrice(a.price) - extractPrice(b.price);
         });
 
-        if (items.length === 0) {
+        if (allItems.length === 0) {
           if (noResults) noResults.classList.remove("hidden");
         } else {
-          renderResults(items);
+          if (filterContainer) filterContainer.classList.remove("hidden");
+          applyFilter(currentFilter);
         }
       } catch (error) {
         console.error("Search failed:", error);
@@ -62,9 +67,40 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Expose filter function globally so the inline HTML handler can trigger it
+  window.applyFilter = function(type) {
+    currentFilter = type;
+    if (!allItems.length) return;
+
+    let filtered = [...allItems];
+    const textMatch = (item, keywords) => {
+      const text = (item.title + ' ' + (item.source || '')).toLowerCase();
+      return keywords.some(k => text.includes(k));
+    };
+
+    if (type === 'new') {
+      filtered = filtered.filter(i => textMatch(i, ['new', 'brand new', 'factory', 'sealed']));
+    } else if (type === 'used') {
+      filtered = filtered.filter(i => textMatch(i, ['used', 'pre-owned', 'second hand', 'vintage', 'refurbished', '70s', '1970']));
+    } else if (type === 'dupe') {
+      filtered = filtered.filter(i => textMatch(i, ['dupe', 'alternative', 'style', 'inspired', 'replica']));
+    } else if (type === 'real') {
+      filtered = filtered.filter(i => textMatch(i, ['authentic', 'real', 'original', 'genuine']));
+    }
+
+    renderResults(filtered.length > 0 ? filtered : allItems);
+  };
+
   function renderResults(items) {
     if (!resultsGrid) return;
     resultsGrid.innerHTML = "";
+
+    if (items.length === 0) {
+      if (noResults) noResults.classList.remove("hidden");
+      return;
+    } else {
+      if (noResults) noResults.classList.add("hidden");
+    }
 
     items.forEach((item, index) => {
       const card = document.createElement("div");
