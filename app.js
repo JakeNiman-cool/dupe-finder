@@ -14,20 +14,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const filterButtons = filterContainer.querySelectorAll("button");
     filterButtons.forEach(btn => {
       btn.addEventListener("click", (e) => {
-        // Highlight active button visually
         filterButtons.forEach(b => b.classList.remove("ring-4", "ring-slate-900", "scale-105"));
         e.currentTarget.classList.add("ring-4", "ring-slate-900", "scale-105");
 
-        // Determine filter type from data attribute, id, or text
-        const filterType = e.currentTarget.dataset.filter || 
-                           e.currentTarget.id.replace('filter-', '') || 
-                           e.currentTarget.textContent.toLowerCase();
+        const text = e.currentTarget.textContent.toLowerCase();
+        const filterType = e.currentTarget.dataset.filter || text;
 
-        if (filterType.includes('new')) applyFilter('new');
-        else if (filterType.includes('used') || filterType.includes('pre-owned') || filterType.includes('secondhand')) applyFilter('used');
-        else if (filterType.includes('dupe') || filterType.includes('alternative') || filterType.includes('cheap')) applyFilter('dupe');
-        else if (filterType.includes('real') || filterType.includes('authentic')) applyFilter('real');
-        else applyFilter('all');
+        if (filterType.includes('high') || filterType.includes('luxury') || filterType.includes('splurge')) {
+          applyFilter('high');
+        } else if (filterType.includes('new')) {
+          applyFilter('new');
+        } else if (filterType.includes('used') || filterType.includes('pre-owned') || filterType.includes('secondhand')) {
+          applyFilter('used');
+        } else if (filterType.includes('dupe') || filterType.includes('alternative') || filterType.includes('cheap')) {
+          applyFilter('dupe');
+        } else if (filterType.includes('real') || filterType.includes('authentic')) {
+          applyFilter('real');
+        } else {
+          applyFilter('all');
+        }
       });
     });
   }
@@ -57,7 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (loadingSpinner) loadingSpinner.classList.add("hidden");
 
-        // Google Serper items
         allItems = data.shopping || [];
 
         function extractPrice(priceStr) {
@@ -66,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return match ? parseFloat(match[0]) : Infinity;
         }
 
-        // Sort items strictly by lowest price (second-hand & new mixed in price order)
+        // Sort default view by lowest price
         allItems.sort((a, b) => extractPrice(a.price) - extractPrice(b.price));
 
         if (allItems.length === 0) {
@@ -89,9 +93,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let filtered = [...allItems];
 
+    const getNum = p => {
+      const m = String(p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
+      return m ? parseFloat(m[0]) : 0;
+    };
+
     const isSecondHandStore = (sourceStr) => {
       const src = (sourceStr || '').toLowerCase();
-      return ['ebay', 'poshmark', 'depop', 'vinted', 'mercari', 'thredup', 'grailed', 'thrift', 'goodwill', 'realreal'].some(marketplace => src.includes(marketplace));
+      return ['ebay', 'poshmark', 'depop', 'vinted', 'mercari', 'thredup', 'grailed', 'thrift', 'goodwill', 'realreal'].some(m => src.includes(m));
     };
 
     const textMatch = (item, keywords) => {
@@ -99,30 +108,34 @@ document.addEventListener("DOMContentLoaded", () => {
       return keywords.some(k => text.includes(k));
     };
 
-    if (type === 'new') {
-      // Exclude secondhand platforms and titles indicating used condition
-      filtered = filtered.filter(i => !isSecondHandStore(i.source) && !textMatch(i, ['used', 'pre-owned', 'secondhand', 'refurbished', 'vintage']));
-    } else if (type === 'used') {
-      // Include any items coming from reseller marketplaces OR with used keywords in the title
-      filtered = filtered.filter(i => isSecondHandStore(i.source) || textMatch(i, ['used', 'pre-owned', 'secondhand', 'vintage', 'refurbished']));
-    } else if (type === 'dupe') {
-      // Show lower-priced items & budget marketplaces
-      const getNum = p => {
-        const m = String(p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
-        return m ? parseFloat(m[0]) : Infinity;
-      };
-      const prices = allItems.map(i => getNum(i.price)).filter(p => p !== Infinity);
-      const maxPrice = prices.length ? Math.max(...prices) : Infinity;
+    if (type === 'high') {
+      // Sort highest price first + filter top 40% price bracket or luxury keywords
+      const validPrices = allItems.map(i => getNum(i.price)).filter(p => p > 0);
+      const avgPrice = validPrices.reduce((a,b) => a+b, 0) / (validPrices.length || 1);
       
-      filtered = filtered.filter(i => getNum(i.price) <= maxPrice * 0.7 || textMatch(i, ['amazon', 'target', 'wayfair', 'walmart', 'shein', 'temu', 'ebay']));
-    } else if (type === 'real') {
-      filtered = filtered.filter(i => textMatch(i, ['authentic', 'real', 'original', 'official', 'genuine']));
+      filtered = filtered.filter(i => getNum(i.price) >= avgPrice || textMatch(i, ['luxury', 'designer', 'authentic', 'original', '1stDibs', 'farfetch', 'saks']));
+      filtered.sort((a, b) => getNum(b.price) - getNum(a.price));
+    } else if (type === 'dupe' || type === 'cheap') {
+      // Lowest 50% price bracket
+      const validPrices = allItems.map(i => getNum(i.price)).filter(p => p > 0);
+      const medianPrice = validPrices.length ? validPrices[Math.floor(validPrices.length / 2)] : Infinity;
+
+      filtered = filtered.filter(i => getNum(i.price) <= medianPrice || textMatch(i, ['amazon', 'target', 'wayfair', 'walmart', 'shein', 'temu', 'ebay']));
+      filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
+    } else if (type === 'new') {
+      filtered = filtered.filter(i => !isSecondHandStore(i.source) && !textMatch(i, ['used', 'pre-owned', 'secondhand', 'refurbished', 'vintage']));
+      filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
+    } else if (type === 'used') {
+      filtered = filtered.filter(i => isSecondHandStore(i.source) || textMatch(i, ['used', 'pre-owned', 'secondhand', 'vintage', 'refurbished']));
+      filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
+    } else {
+      filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
     }
 
-    renderResults(filtered.length > 0 ? filtered : allItems);
+    renderResults(filtered.length > 0 ? filtered : allItems, type);
   }
 
-  function renderResults(items) {
+  function renderResults(items, activeType) {
     if (!resultsGrid) return;
     resultsGrid.innerHTML = "";
 
@@ -140,18 +153,28 @@ document.addEventListener("DOMContentLoaded", () => {
       const imageUrl = item.imageUrl || item.thumbnail || item.image || item.photo;
 
       let badgeHTML = '';
-      if (index === 0) {
-        badgeHTML = `
-          <div class="absolute -top-3 -right-2 bg-yellow-300 text-slate-900 text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
-            🔥 ABSOLUTE LOWEST PRICE
-          </div>
-        `;
-      } else if (index === 1) {
-        badgeHTML = `
-          <div class="absolute -top-3 -right-2 bg-pink-500 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] -rotate-2 z-20">
-            💸 CRAZY CHEAP DEAL
-          </div>
-        `;
+      if (activeType === 'high') {
+        if (index === 0) {
+          badgeHTML = `
+            <div class="absolute -top-3 -right-2 bg-purple-600 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
+              👑 ULTIMATE SPLURGE
+            </div>
+          `;
+        }
+      } else {
+        if (index === 0) {
+          badgeHTML = `
+            <div class="absolute -top-3 -right-2 bg-yellow-300 text-slate-900 text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
+              🔥 ABSOLUTE LOWEST PRICE
+            </div>
+          `;
+        } else if (index === 1) {
+          badgeHTML = `
+            <div class="absolute -top-3 -right-2 bg-pink-500 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] -rotate-2 z-20">
+              💸 CRAZY CHEAP DEAL
+            </div>
+          `;
+        }
       }
 
       const imageSection = imageUrl ? `
