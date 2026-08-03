@@ -7,38 +7,26 @@ document.addEventListener("DOMContentLoaded", () => {
   const filterContainer = document.getElementById("filter-container");
 
   let allItems = [];
-  let currentFilter = 'all';
+  let currentFilter = 'low-to-high';
 
-  // --- Attach Click Listeners to Filter Buttons ---
+  // --- Click Handler for Sidebar Buttons ---
   if (filterContainer) {
-    const filterButtons = filterContainer.querySelectorAll("button");
+    const filterButtons = filterContainer.querySelectorAll("button[data-filter]");
     filterButtons.forEach(btn => {
       btn.addEventListener("click", (e) => {
+        // Clear active outline styling from all buttons
         filterButtons.forEach(b => b.classList.remove("ring-4", "ring-slate-900", "scale-105"));
+        
+        // Add active outline to clicked button
         e.currentTarget.classList.add("ring-4", "ring-slate-900", "scale-105");
 
-        const text = e.currentTarget.textContent.toLowerCase();
-        const filterType = e.currentTarget.dataset.filter || text;
-
-        if (filterType.includes('low to high') || filterType.includes('cheapest')) {
-          applyFilter('low-to-high');
-        } else if (filterType.includes('high to low') || filterType.includes('splurge') || filterType.includes('expensive')) {
-          applyFilter('high-to-low');
-        } else if (filterType.includes('new')) {
-          applyFilter('new');
-        } else if (filterType.includes('used') || filterType.includes('pre-owned') || filterType.includes('secondhand')) {
-          applyFilter('used');
-        } else if (filterType.includes('dupe') || filterType.includes('alternative') || filterType.includes('cheap')) {
-          applyFilter('dupe');
-        } else if (filterType.includes('real') || filterType.includes('authentic')) {
-          applyFilter('real');
-        } else {
-          applyFilter('all');
-        }
+        const filterType = e.currentTarget.dataset.filter;
+        applyFilter(filterType);
       });
     });
   }
 
+  // --- Form Search Handler ---
   if (searchForm) {
     searchForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -49,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (loadingSpinner) loadingSpinner.classList.remove("hidden");
       if (noResults) noResults.classList.add("hidden");
       if (resultsGrid) resultsGrid.innerHTML = "";
-      if (filterContainer) filterContainer.classList.add("hidden");
 
       try {
         let query = rawQuery;
@@ -66,17 +53,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         allItems = data.shopping || [];
 
-        function extractPrice(priceStr) {
-          if (!priceStr) return Infinity;
-          const match = String(priceStr).replace(/[^0-9.]/g, '').match(/[\d.]+/);
-          return match ? parseFloat(match[0]) : Infinity;
-        }
-
-        // Default sort: Lowest Price to Highest Price
-        allItems.sort((a, b) => extractPrice(a.price) - extractPrice(b.price));
-
         if (allItems.length === 0) {
           if (noResults) noResults.classList.remove("hidden");
+          if (filterContainer) filterContainer.classList.add("hidden");
         } else {
           if (filterContainer) filterContainer.classList.remove("hidden");
           applyFilter(currentFilter);
@@ -89,15 +68,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // --- Filter & Sort Processor ---
   function applyFilter(type) {
     currentFilter = type;
     if (!allItems.length) return;
 
     let filtered = [...allItems];
 
-    const getNum = p => {
-      const m = String(p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
-      return m ? parseFloat(m[0]) : 0;
+    const getNum = priceStr => {
+      if (!priceStr) return 0;
+      const match = String(priceStr).replace(/[^0-9.]/g, '').match(/[\d.]+/);
+      return match ? parseFloat(match[0]) : 0;
     };
 
     const isSecondHandStore = (sourceStr) => {
@@ -111,12 +92,10 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     if (type === 'low-to-high') {
-      // Sort strictly by lowest price first
       filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
     } else if (type === 'high-to-low') {
-      // Sort strictly by highest price first
       filtered.sort((a, b) => getNum(b.price) - getNum(a.price));
-    } else if (type === 'dupe' || type === 'cheap') {
+    } else if (type === 'dupe') {
       const validPrices = allItems.map(i => getNum(i.price)).filter(p => p > 0);
       const medianPrice = validPrices.length ? validPrices[Math.floor(validPrices.length / 2)] : Infinity;
 
@@ -129,12 +108,14 @@ document.addEventListener("DOMContentLoaded", () => {
       filtered = filtered.filter(i => isSecondHandStore(i.source) || textMatch(i, ['used', 'pre-owned', 'secondhand', 'vintage', 'refurbished']));
       filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
     } else {
+      // Default: All Deals
       filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
     }
 
     renderResults(filtered.length > 0 ? filtered : allItems, type);
   }
 
+  // --- Render Product Cards ---
   function renderResults(items, activeType) {
     if (!resultsGrid) return;
     resultsGrid.innerHTML = "";
@@ -156,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (activeType === 'high-to-low') {
         if (index === 0) {
           badgeHTML = `
-            <div class="absolute -top-3 -right-2 bg-purple-600 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
+            <div class="absolute -top-3 -right-2 bg-purple-600 text-white text-xs font-black px-3 py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
               👑 HIGHEST PRICE
             </div>
           `;
@@ -164,13 +145,13 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         if (index === 0) {
           badgeHTML = `
-            <div class="absolute -top-3 -right-2 bg-yellow-300 text-slate-900 text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
+            <div class="absolute -top-3 -right-2 bg-yellow-300 text-slate-900 text-xs font-black px-3 py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
               🔥 ABSOLUTE LOWEST PRICE
             </div>
           `;
         } else if (index === 1) {
           badgeHTML = `
-            <div class="absolute -top-3 -right-2 bg-pink-500 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] -rotate-2 z-20">
+            <div class="absolute -top-3 -right-2 bg-pink-500 text-white text-xs font-black px-3 py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b] -rotate-2 z-20">
               💸 CRAZY CHEAP DEAL
             </div>
           `;
@@ -187,14 +168,14 @@ document.addEventListener("DOMContentLoaded", () => {
         <div>
           ${badgeHTML}
           ${imageSection}
-          <h3 class="text-slate-900 hover:text-pink-600 transition-colors mb-2 line-clamp-2 text-lg font-bold">
+          <h3 class="text-slate-900 hover:text-pink-600 transition-colors mb-2 line-clamp-2 text-base font-bold">
             <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
           </h3>
-          <p class="text-pink-600 text-2xl font-black mb-3">${item.price || "Check site for price"}</p>
+          <p class="text-pink-600 text-2xl font-black mb-3">${item.price || "Check site"}</p>
         </div>
         <div class="pt-4 border-t-2 border-slate-100 flex items-center justify-between text-sm">
-          <span class="bg-purple-100 text-purple-700 px-3 py-1.5 rounded-xl border-2 border-slate-900 font-bold truncate max-w-[120px]">${item.source || "Store"}</span>
-          <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="cartoony-button px-4 py-2 bg-yellow-300 text-slate-900 font-bold rounded-xl hover:bg-yellow-400 border-2 border-slate-900">
+          <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-xl border-2 border-slate-900 font-bold truncate max-w-[110px]">${item.source || "Store"}</span>
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="cartoony-button px-3 py-1.5 bg-yellow-300 text-slate-900 font-bold text-xs rounded-xl hover:bg-yellow-400 border-2 border-slate-900">
             Grab Deal 🛒
           </a>
         </div>
