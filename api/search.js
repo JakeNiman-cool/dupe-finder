@@ -11,8 +11,11 @@ export default async function handler(req, res) {
       'Content-Type': 'application/json'
     };
 
-    // Run parallel requests: standard query + luxury/high-end query
-    const [standardRes, luxuryRes] = await Promise.all([
+    // Run 3 parallel fetches:
+    // 1. Standard search
+    // 2. High-end / luxury search
+    // 3. Explicit eBay & secondhand search to guarantee high volume of resale listings
+    const [standardRes, luxuryRes, ebayRes] = await Promise.all([
       fetch(`https://google.serper.dev/shopping`, {
         method: 'POST',
         headers: serperHeaders,
@@ -21,20 +24,27 @@ export default async function handler(req, res) {
       fetch(`https://google.serper.dev/shopping`, {
         method: 'POST',
         headers: serperHeaders,
-        body: JSON.stringify({ q: `${query} luxury designer high end authentic`, num: 100 })
+        body: JSON.stringify({ q: `${query} luxury designer authentic`, num: 100 })
+      }),
+      fetch(`https://google.serper.dev/shopping`, {
+        method: 'POST',
+        headers: serperHeaders,
+        body: JSON.stringify({ q: `site:ebay.com ${query}`, num: 100 })
       })
     ]);
 
     const standardData = await standardRes.json();
     const luxuryData = await luxuryRes.json();
+    const ebayData = await ebayRes.json();
 
     const standardItems = standardData.shopping || [];
     const luxuryItems = luxuryData.shopping || [];
+    const ebayItems = ebayData.shopping || [];
 
-    // Combine both result sets
-    const combined = [...standardItems, ...luxuryItems];
+    // Combine all 3 sources
+    const combined = [...standardItems, ...ebayItems, ...luxuryItems];
 
-    // Remove duplicate items by link or title
+    // Remove duplicates while preserving unique eBay links
     const seenLinks = new Set();
     const uniqueItems = combined.filter(item => {
       const identifier = item.link || item.title;
