@@ -37,7 +37,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function extractPrice(priceStr) {
           if (!priceStr) return Infinity;
-          const match = priceStr.replace(/,/g, '').match(/[\d.]+/);
+          // Clean currency symbols, commas, and grab the first valid float number
+          const match = priceStr.replace(/[^0-9.]/g, '').match(/[\d.]+/);
           return match ? parseFloat(match[0]) : Infinity;
         }
 
@@ -48,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return !excludedSources.some(exc => sourceName.includes(exc));
         });
 
-        // Strict sort: Lowest price first
+        // Strict numeric sort: Absolute lowest price FIRST without exception
         allItems.sort((a, b) => {
           return extractPrice(a.price) - extractPrice(b.price);
         });
@@ -67,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Expose filter function globally so the inline HTML handler can trigger it
+  // Smooth filter execution without losing item order or data
   window.applyFilter = function(type) {
     currentFilter = type;
     if (!allItems.length) return;
@@ -88,6 +89,15 @@ document.addEventListener("DOMContentLoaded", () => {
       filtered = filtered.filter(i => textMatch(i, ['authentic', 'real', 'original', 'genuine']));
     }
 
+    // Maintain lowest price sorting even after category filter
+    filtered.sort((a, b) => {
+      const getNum = p => {
+        const m = (p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
+        return m ? parseFloat(m[0]) : Infinity;
+      };
+      return getNum(a.price) - getNum(b.price);
+    });
+
     renderResults(filtered.length > 0 ? filtered : allItems);
   };
 
@@ -104,7 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     items.forEach((item, index) => {
       const card = document.createElement("div");
-      card.className = "cartoony-card bg-white rounded-3xl p-5 flex flex-col justify-between relative";
+      card.className = "cartoony-card bg-white rounded-3xl p-5 flex flex-col justify-between relative transition-all duration-200";
       
       const imageUrl = item.imageUrl || item.thumbnail || item.image || item.photo;
 
