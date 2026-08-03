@@ -1,14 +1,37 @@
 document.addEventListener("DOMContentLoaded", () => {
   const searchForm = document.getElementById("search-form");
   const searchInput = document.getElementById("search-input");
+  const genderSelect = document.getElementById("gender-select");
+  const sizeInput = document.getElementById("size-input");
   const loadingSpinner = document.getElementById("loading-spinner");
   const noResults = document.getElementById("no-results");
   const resultsGrid = document.getElementById("results-grid");
   const filterContainer = document.getElementById("filter-container");
   const recentTagsContainer = document.getElementById("recent-tags");
+  const categoryPills = document.querySelectorAll("#category-pills button");
 
   let allItems = [];
   let currentFilter = 'all';
+  let selectedCategory = '';
+
+  // --- Category Pill Clicks ---
+  categoryPills.forEach(pill => {
+    pill.addEventListener("click", () => {
+      categoryPills.forEach(p => p.classList.remove("ring-4", "ring-slate-900", "scale-105"));
+      
+      const cat = pill.dataset.category;
+      if (selectedCategory === cat) {
+        selectedCategory = ''; // Toggle off
+      } else {
+        selectedCategory = cat;
+        pill.classList.add("ring-4", "ring-slate-900", "scale-105");
+      }
+
+      if (searchInput.value.trim()) {
+        performSearch(searchInput.value.trim());
+      }
+    });
+  });
 
   // --- Load Recent Searches ---
   function loadRecentSearches() {
@@ -37,14 +60,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let history = JSON.parse(localStorage.getItem("recent_searches") || "[]");
     history = history.filter(item => item.toLowerCase() !== term.toLowerCase());
     history.unshift(term);
-    if (history.length > 5) history.pop(); // Keep last 5 searches
+    if (history.length > 5) history.pop();
     localStorage.setItem("recent_searches", JSON.stringify(history));
     loadRecentSearches();
   }
 
   loadRecentSearches();
 
-  // --- Sidebar Button Handlers ---
+  // --- Sidebar Button Selection ---
   if (filterContainer) {
     const filterButtons = filterContainer.querySelectorAll("button[data-filter]");
     
@@ -73,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Search Execution ---
+  // --- Perform Search ---
   async function performSearch(rawQuery) {
     if (!rawQuery) return;
 
@@ -84,19 +107,26 @@ document.addEventListener("DOMContentLoaded", () => {
     if (resultsGrid) resultsGrid.innerHTML = "";
 
     try {
-      let query = rawQuery;
-      const lowerQ = rawQuery.toLowerCase();
-      
-      if (lowerQ.includes('hand couch') || lowerQ === 'hand chair') {
-        query = 'hand chair';
-      }
+      const gender = genderSelect ? genderSelect.value : '';
+      const size = sizeInput ? sizeInput.value.trim() : '';
 
-      const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+      const url = `/api/search?query=${encodeURIComponent(rawQuery)}&category=${encodeURIComponent(selectedCategory)}&gender=${encodeURIComponent(gender)}&size=${encodeURIComponent(size)}`;
+      
+      const response = await fetch(url);
       const data = await response.json();
 
       if (loadingSpinner) loadingSpinner.classList.add("hidden");
 
       allItems = data.shopping || [];
+
+      function extractPrice(priceStr) {
+        if (!priceStr) return Infinity;
+        const match = String(priceStr).replace(/[^0-9.]/g, '').match(/[\d.]+/);
+        return match ? parseFloat(match[0]) : Infinity;
+      }
+
+      // Default sort by lowest price so $5 eBay listings jump right to the top
+      allItems.sort((a, b) => extractPrice(a.price) - extractPrice(b.price));
 
       if (allItems.length === 0) {
         if (noResults) noResults.classList.remove("hidden");
@@ -117,7 +147,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Filter & Trending Processor ---
+  // --- Apply Filters & Badging ---
   function applyFilter(type) {
     currentFilter = type;
     if (!allItems.length) return;
@@ -141,8 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     if (type === 'trending') {
-      // Pick popular sources or items with reviews/ratings
-      filtered = filtered.filter(i => (i.rating || i.reviews) || textMatch(i, ['amazon', 'sephora', 'nike', 'nordstrom', 'target', 'viral']));
+      filtered = filtered.filter(i => (i.rating || i.reviews) || textMatch(i, ['amazon', 'sephora', 'nike', 'nordstrom', 'target']));
       if (!filtered.length) filtered = [...allItems];
     } else if (type === 'low-to-high') {
       filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
@@ -170,7 +199,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderResults(filtered.length > 0 ? filtered : allItems, type);
   }
 
-  // --- Render Product Cards ---
+  // --- Render Results Grid ---
   function renderResults(items, activeType) {
     if (!resultsGrid) return;
     resultsGrid.innerHTML = "";
