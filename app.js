@@ -37,21 +37,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
         function extractPrice(priceStr) {
           if (!priceStr) return Infinity;
-          // Clean currency symbols, commas, and grab the first valid float number
           const match = priceStr.replace(/[^0-9.]/g, '').match(/[\d.]+/);
           return match ? parseFloat(match[0]) : Infinity;
         }
 
-        // Filter out expensive resale/luxury platforms to keep things truly cheap
+        // Filter out expensive resale/luxury platforms
         const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods', '1stdibs'];
         allItems = allItems.filter(item => {
           const sourceName = (item.source || '').toLowerCase();
           return !excludedSources.some(exc => sourceName.includes(exc));
         });
 
-        // Strict numeric sort: Absolute lowest price FIRST without exception
+        // Advanced sorting: Prioritize cheap marketplace sources (eBay, Vinted) and absolute lowest prices
         allItems.sort((a, b) => {
-          return extractPrice(a.price) - extractPrice(b.price);
+          const priceA = extractPrice(a.price);
+          const priceB = extractPrice(b.price);
+
+          const sourceA = (a.source || '').toLowerCase();
+          const sourceB = (b.source || '').toLowerCase();
+          
+          const isBargainMarketplace = (s) => s.includes('ebay') || s.includes('vinted') || s.includes('depop') || s.includes('mercari');
+          const marketA = isBargainMarketplace(sourceA) ? 1 : 0;
+          const marketB = isBargainMarketplace(sourceB) ? 1 : 0;
+
+          // If prices are relatively close (within 25%), push eBay/Vinted to the top
+          if (Math.abs(priceA - priceB) < (Math.min(priceA, priceB) * 0.25)) {
+            if (marketA !== marketB) {
+              return marketB - marketA;
+            }
+          }
+
+          return priceA - priceB;
         });
 
         if (allItems.length === 0) {
@@ -63,12 +79,11 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
         console.error("Search failed:", error);
         if (loadingSpinner) loadingSpinner.classList.add("hidden");
-        if (noResults) noResults.classList.remove("hidden");
+        if (noResults) noResults.classList.add("hidden");
       }
     });
   }
 
-  // Smooth filter execution without losing item order or data
   window.applyFilter = function(type) {
     currentFilter = type;
     if (!allItems.length) return;
@@ -82,14 +97,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (type === 'new') {
       filtered = filtered.filter(i => textMatch(i, ['new', 'brand new', 'factory', 'sealed']));
     } else if (type === 'used') {
-      filtered = filtered.filter(i => textMatch(i, ['used', 'pre-owned', 'second hand', 'vintage', 'refurbished', '70s', '1970']));
+      filtered = filtered.filter(i => textMatch(i, ['used', 'pre-owned', 'second hand', 'vintage', 'refurbished', 'ebay', 'vinted', '70s', '1970']));
     } else if (type === 'dupe') {
       filtered = filtered.filter(i => textMatch(i, ['dupe', 'alternative', 'style', 'inspired', 'replica']));
     } else if (type === 'real') {
       filtered = filtered.filter(i => textMatch(i, ['authentic', 'real', 'original', 'genuine']));
     }
 
-    // Maintain lowest price sorting even after category filter
     filtered.sort((a, b) => {
       const getNum = p => {
         const m = (p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
