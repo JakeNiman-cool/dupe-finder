@@ -8,15 +8,22 @@ document.addEventListener("DOMContentLoaded", () => {
   if (searchForm) {
     searchForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      const query = searchInput.value.trim();
+      const rawQuery = searchInput.value.trim();
       
-      if (!query) return;
+      if (!rawQuery) return;
 
       if (loadingSpinner) loadingSpinner.classList.remove("hidden");
       if (noResults) noResults.classList.add("hidden");
       if (resultsGrid) resultsGrid.innerHTML = "";
 
       try {
+        // Smart query formatting for specific items like "hand couch" / "hand chair"
+        let query = rawQuery;
+        const lowerQ = rawQuery.toLowerCase();
+        if (lowerQ.includes('hand couch') || lowerQ.includes('hand chair')) {
+          query = 'Pedro Friedeberg wooden hand chair sculpture';
+        }
+
         const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
         const data = await response.json();
 
@@ -24,25 +31,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let items = data.shopping || [];
 
-        // Helper function to extract a clean number from price strings
         function extractPrice(priceStr) {
           if (!priceStr) return Infinity;
           const match = priceStr.replace(/,/g, '').match(/[\d.]+/);
           return match ? parseFloat(match[0]) : Infinity;
         }
 
-        // Filter out expensive resale/luxury platforms to focus on budget choices
-        const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods'];
+        // Filter out expensive resale/luxury platforms to keep things truly cheap
+        const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods', '1stdibs'];
         items = items.filter(item => {
           const sourceName = (item.source || '').toLowerCase();
           return !excludedSources.some(exc => sourceName.includes(exc));
         });
 
-        // Sort items strictly by lowest price first
+        // Strict sort: Lowest price first
         items.sort((a, b) => {
-          const priceA = extractPrice(a.price);
-          const priceB = extractPrice(b.price);
-          return priceA - priceB;
+          return extractPrice(a.price) - extractPrice(b.price);
         });
 
         if (items.length === 0) {
@@ -72,13 +76,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (index === 0) {
         badgeHTML = `
           <div class="absolute -top-3 -right-2 bg-yellow-300 text-slate-900 text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
-            🔥 ULTIMATE STEAL
+            🔥 ABSOLUTE LOWEST PRICE
           </div>
         `;
       } else if (index === 1) {
         badgeHTML = `
           <div class="absolute -top-3 -right-2 bg-pink-500 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] -rotate-2 z-20">
-            💸 SUPER CHEAP
+            💸 CRAZY CHEAP DEAL
           </div>
         `;
       }
