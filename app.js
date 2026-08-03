@@ -24,12 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const items = data.shopping || [];
 
-        // Debug log the first item to inspect keys
-        if (items.length > 0) {
-          console.log("FIRST SHOPPING ITEM KEYS:", Object.keys(items[0]));
-          console.log("FIRST SHOPPING ITEM DATA:", items[0]);
-        }
-
         if (items.length === 0) {
           if (noResults) noResults.classList.remove("hidden");
         } else {
@@ -49,29 +43,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     items.forEach((item) => {
       const card = document.createElement("div");
-      card.className = "bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between hover:border-purple-500/50 transition-all shadow-lg group";
+      card.className = "cartoony-card bg-white rounded-3xl p-5 flex flex-col justify-between";
       
-      // Check multiple possible key names for the image URL
       const imageUrl = item.imageUrl || item.thumbnail || item.image || item.photo;
 
       const imageSection = imageUrl ? `
-        <div class="w-full h-48 bg-slate-900/50 rounded-xl overflow-hidden mb-4 flex items-center justify-center p-2 border border-slate-700/50">
-          <img src="${imageUrl}" alt="${item.title}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300" />
+        <div class="w-full h-48 bg-amber-100 rounded-2xl overflow-hidden mb-4 flex items-center justify-center p-2 border-2 border-slate-900">
+          <img src="${imageUrl}" alt="${item.title}" class="max-h-full max-w-full object-contain hover:scale-110 transition-transform duration-300" />
         </div>
       ` : '';
 
       card.innerHTML = `
         <div>
           ${imageSection}
-          <h3 class="font-semibold text-slate-100 group-hover:text-purple-400 transition-colors mb-2 line-clamp-2">
+          <h3 class="font-bold text-slate-900 hover:text-pink-600 transition-colors mb-2 line-clamp-2 text-base">
             <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
           </h3>
-          <p class="text-purple-400 font-bold text-lg mb-2">${item.price || ""}</p>
+          <p class="text-pink-600 font-black text-xl mb-3">${item.price || ""}</p>
         </div>
-        <div class="pt-4 border-t border-slate-700/50 flex items-center justify-between text-xs">
-          <span class="text-slate-500 truncate max-w-[150px]">${item.source || "Online Store"}</span>
-          <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-purple-600/20 text-purple-300 rounded-lg hover:bg-purple-600 hover:text-white transition-all font-medium">
-            View Deal &rarr;
+        <div class="pt-4 border-t-2 border-slate-100 flex items-center justify-between text-xs">
+          <span class="bg-purple-100 text-purple-700 px-2.5 py-1 rounded-lg font-bold border border-slate-900 truncate max-w-[120px]">${item.source || "Store"}</span>
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="cartoony-button px-4 py-2 bg-yellow-300 text-slate-900 rounded-xl font-bold text-xs hover:bg-yellow-400">
+            Grab Deal 🛒
           </a>
         </div>
       `;
