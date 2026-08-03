@@ -180,31 +180,56 @@
       </div>
     </div>
 
-    <!-- NEW: Condition & Type Filter Bar (New, Used, Real, Fake/Dupe) -->
-    <div id="filter-container" class="hidden flex flex-wrap items-center justify-center gap-3 mb-8">
-      <span class="text-slate-700 font-bold">Filter By:</span>
-      <button type="button" onclick="filterCondition('all')" class="filter-btn px-4 py-2 bg-purple-600 text-white border-3 border-slate-900 rounded-xl shadow-[2px_2px_0px_#1e293b] text-base transition-all">All Deals</button>
-      <button type="button" onclick="filterCondition('new')" class="filter-btn px-4 py-2 bg-white text-slate-900 border-3 border-slate-900 hover:bg-pink-100 rounded-xl shadow-[2px_2px_0px_#1e293b] text-base transition-all">✨ Brand New</button>
-      <button type="button" onclick="filterCondition('used')" class="filter-btn px-4 py-2 bg-white text-slate-900 border-3 border-slate-900 hover:bg-pink-100 rounded-xl shadow-[2px_2px_0px_#1e293b] text-base transition-all">♻️ Used / Pre-Loved</button>
-      <button type="button" onclick="filterCondition('dupe')" class="filter-btn px-4 py-2 bg-white text-slate-900 border-3 border-slate-900 hover:bg-pink-100 rounded-xl shadow-[2px_2px_0px_#1e293b] text-base transition-all">🪄 Cheap Dupe / Alternative</button>
-      <button type="button" onclick="filterCondition('real')" class="filter-btn px-4 py-2 bg-white text-slate-900 border-3 border-slate-900 hover:bg-pink-100 rounded-xl shadow-[2px_2px_0px_#1e293b] text-base transition-all">💎 Authentic / Real</button>
-    </div>
+    <!-- Layout Container with Left Sidebar and Right Results Area -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start mb-20">
+      
+      <!-- LEFT SIDEBAR: Condition & Type Filters -->
+      <div id="filter-container" class="hidden lg:col-span-1 bg-white border-4 border-slate-900 rounded-3xl p-6 shadow-[6px_6px_0px_#1e293b] sticky top-28">
+        <h3 class="text-2xl text-slate-900 mb-5 border-b-2 border-slate-100 pb-3">⚙️ Filter By</h3>
+        <div class="flex flex-col gap-4">
+          <button type="button" onclick="filterCondition('all', this)" class="filter-btn flex items-center gap-3 w-full text-left p-3 rounded-2xl border-2 border-slate-900 bg-blue-500 text-white font-bold transition-all shadow-[2px_2px_0px_#1e293b]">
+            <span class="w-6 h-6 rounded-full border-2 border-slate-900 bg-blue-600 flex items-center justify-center transition-all circle-indicator">✓</span>
+            <span>All Deals</span>
+          </button>
+          <button type="button" onclick="filterCondition('new', this)" class="filter-btn flex items-center gap-3 w-full text-left p-3 rounded-2xl border-2 border-slate-900 bg-white hover:bg-pink-50 text-slate-900 font-bold transition-all shadow-[2px_2px_0px_#1e293b]">
+            <span class="w-6 h-6 rounded-full border-2 border-slate-900 bg-white flex items-center justify-center transition-all circle-indicator"></span>
+            <span>✨ Brand New</span>
+          </button>
+          <button type="button" onclick="filterCondition('used', this)" class="filter-btn flex items-center gap-3 w-full text-left p-3 rounded-2xl border-2 border-slate-900 bg-white hover:bg-pink-50 text-slate-900 font-bold transition-all shadow-[2px_2px_0px_#1e293b]">
+            <span class="w-6 h-6 rounded-full border-2 border-slate-900 bg-white flex items-center justify-center transition-all circle-indicator"></span>
+            <span>♻️ Used / Pre-Loved</span>
+          </button>
+          <button type="button" onclick="filterCondition('dupe', this)" class="filter-btn flex items-center gap-3 w-full text-left p-3 rounded-2xl border-2 border-slate-900 bg-white hover:bg-pink-50 text-slate-900 font-bold transition-all shadow-[2px_2px_0px_#1e293b]">
+            <span class="w-6 h-6 rounded-full border-2 border-slate-900 bg-white flex items-center justify-center transition-all circle-indicator"></span>
+            <span>🪄 Cheap Alternative</span>
+          </button>
+          <button type="button" onclick="filterCondition('real', this)" class="filter-btn flex items-center gap-3 w-full text-left p-3 rounded-2xl border-2 border-slate-900 bg-white hover:bg-pink-50 text-slate-900 font-bold transition-all shadow-[2px_2px_0px_#1e293b]">
+            <span class="w-6 h-6 rounded-full border-2 border-slate-900 bg-white flex items-center justify-center transition-all circle-indicator"></span>
+            <span>💎 Authentic / Real</span>
+          </button>
+        </div>
+      </div>
 
-    <!-- Loading Spinner -->
-    <div id="loading-spinner" class="hidden flex flex-col items-center justify-center my-16">
-      <div class="w-16 h-16 border-4 border-slate-900 border-t-pink-500 rounded-full animate-spin mb-4 shadow-[4px_4px_0px_#1e293b]"></div>
-      <p class="text-slate-900 text-xl">Hunting down sweet cheap deals across the web... 🕵️‍♀️</p>
-    </div>
+      <!-- RIGHT AREA: Loading, No Results, and Grid -->
+      <div class="lg:col-span-3 w-full">
+        <!-- Loading Spinner -->
+        <div id="loading-spinner" class="hidden flex flex-col items-center justify-center my-16">
+          <div class="w-16 h-16 border-4 border-slate-900 border-t-pink-500 rounded-full animate-spin mb-4 shadow-[4px_4px_0px_#1e293b]"></div>
+          <p class="text-slate-900 text-xl">Hunting down sweet cheap deals across the web... 🕵️‍♀️</p>
+        </div>
 
-    <!-- No Results Message -->
-    <div id="no-results" class="hidden text-center py-12 bg-white border-4 border-slate-900 rounded-3xl my-8 max-w-lg mx-auto shadow-[6px_6px_0px_#1e293b]">
-      <div class="text-6xl mb-3">😿</div>
-      <h3 class="text-3xl text-slate-900">No dupes found right now!</h3>
-      <p class="text-slate-700 text-lg mt-2">Try searching for something a bit more general.</p>
-    </div>
+        <!-- No Results Message -->
+        <div id="no-results" class="hidden text-center py-12 bg-white border-4 border-slate-900 rounded-3xl my-8 max-w-lg mx-auto shadow-[6px_6px_0px_#1e293b]">
+          <div class="text-6xl mb-3">😿</div>
+          <h3 class="text-3xl text-slate-900">No dupes found right now!</h3>
+          <p class="text-slate-700 text-lg mt-2">Try searching for something a bit more general.</p>
+        </div>
 
-    <!-- Results Grid Container -->
-    <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-20"></div>
+        <!-- Results Grid Container -->
+        <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8"></div>
+      </div>
+
+    </div>
 
     <!-- How DupeSpotter Works Section -->
     <div class="bg-white border-4 border-slate-900 rounded-3xl p-8 mb-16 shadow-[6px_6px_0px_#1e293b]">
@@ -264,7 +289,7 @@
     </div>
   </footer>
 
-  <!-- Helper Script -->
+  <!-- Helper Scripts -->
   <script>
     function searchTag(query) {
       const input = document.getElementById('search-input');
@@ -272,6 +297,37 @@
       if(input && form) {
         input.value = query;
         form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }
+    }
+
+    function filterCondition(type, btnElement) {
+      // Handle the blue button and circle toggle UI effects
+      const buttons = document.querySelectorAll('.filter-btn');
+      buttons.forEach(b => {
+        b.classList.remove('bg-blue-500', 'text-white');
+        b.classList.add('bg-white', 'text-slate-900');
+        const circle = b.querySelector('.circle-indicator');
+        if (circle) {
+          circle.classList.remove('bg-blue-600', 'text-white');
+          circle.classList.add('bg-white');
+          circle.textContent = '';
+        }
+      });
+
+      if (btnElement) {
+        btnElement.classList.remove('bg-white', 'text-slate-900');
+        btnElement.classList.add('bg-blue-500', 'text-white');
+        const activeCircle = btnElement.querySelector('.circle-indicator');
+        if (activeCircle) {
+          activeCircle.classList.remove('bg-white');
+          activeCircle.classList.add('bg-blue-600', 'text-white');
+          activeCircle.textContent = '✓';
+        }
+      }
+
+      // Trigger condition filtering logic if available in app.js
+      if (typeof window.applyFilter === 'function') {
+        window.applyFilter(type);
       }
     }
   </script>
