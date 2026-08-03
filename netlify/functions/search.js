@@ -11,26 +11,38 @@ exports.handler = async function (event, context) {
   try {
     const apiKey = process.env.SERPAPI_KEY;
 
-    // Direct, standard SerpApi Google Shopping call
+    if (!apiKey) {
+      console.error('SERPAPI_KEY is missing from environment variables');
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: 'SERPAPI_KEY is missing on Netlify' }),
+      };
+    }
+
+    // Direct Google Shopping Request via SerpApi
     const response = await fetch(
       `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(query)}&api_key=${apiKey}`
     );
 
     const data = await response.json();
 
-    // Log error directly to Netlify if SerpApi returns an account/key error
+    // Check if SerpApi returned an explicit account or request error
     if (data.error) {
-      console.error('SerpApi returned error:', data.error);
+      console.error('SerpApi returned an error:', data.error);
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: `SerpApi Error: ${data.error}` }),
+      };
     }
 
     const shoppingResults = data.shopping_results || [];
 
     const cleanedResults = shoppingResults.map(item => ({
-      title: item.title,
-      price: item.extracted_price || item.price,
-      formattedPrice: item.price,
-      link: item.link,
-      image: item.thumbnail,
+      title: item.title || 'Product Alternative',
+      price: item.extracted_price || item.price || 'Check Store',
+      formattedPrice: item.price || (item.extracted_price ? `$${item.extracted_price}` : 'See Store'),
+      link: item.link || '#',
+      image: item.thumbnail || item.image || 'https://via.placeholder.com/150',
       source: item.source || 'Store'
     }));
 
@@ -42,10 +54,10 @@ exports.handler = async function (event, context) {
       body: JSON.stringify({ results: cleanedResults }),
     };
   } catch (error) {
-    console.error('SerpApi Error:', error);
+    console.error('Function Execution Error:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Failed to fetch search results' }),
+      body: JSON.stringify({ error: error.message || 'Failed to fetch search results' }),
     };
   }
 };
