@@ -9,187 +9,192 @@
   <link rel="icon" type="image/png" href="favicon.png" />
   <link rel="apple-touch-icon" href="favicon.png" />
 
+  <!-- Modern Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800;900&display=swap" rel="stylesheet">
+
   <script src="https://cdn.tailwindcss.com"></script>
   
   <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
     .cartoony-card {
-      border: 3px solid #1e293b;
-      box-shadow: 4px 4px 0px #1e293b;
+      border: 2px solid #0f172a;
+      box-shadow: 4px 4px 0px #0f172a;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .cartoony-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 6px 6px 0px #1e293b;
+      transform: translateY(-3px);
+      box-shadow: 6px 6px 0px #0f172a;
     }
     .cartoony-button {
-      border: 3px solid #1e293b;
-      box-shadow: 3px 3px 0px #1e293b;
+      border: 2px solid #0f172a;
+      box-shadow: 3px 3px 0px #0f172a;
       transition: all 0.15s ease;
+    }
+    .cartoony-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 4px 4px 0px #0f172a;
     }
     .cartoony-button:active {
       transform: translate(2px, 2px);
-      box-shadow: 1px 1px 0px #1e293b;
+      box-shadow: 1px 1px 0px #0f172a;
     }
     .cartoony-input {
-      border: 3px solid #1e293b;
-      box-shadow: 4px 4px 0px #1e293b;
+      border: 2px solid #0f172a;
+      box-shadow: 3px 3px 0px #0f172a;
+      transition: all 0.15s ease;
+    }
+    .cartoony-input:focus {
+      box-shadow: 5px 5px 0px #0f172a;
     }
     .dropdown-content {
-      border: 3px solid #1e293b;
-      box-shadow: 4px 4px 0px #1e293b;
+      border: 2px solid #0f172a;
+      box-shadow: 4px 4px 0px #0f172a;
       max-height: 320px;
       overflow-y: auto;
     }
   </style>
 </head>
-<body class="bg-pink-50 min-h-screen font-sans text-slate-900 pb-16">
+<body class="bg-gradient-to-br from-pink-50 via-purple-50 to-amber-50 min-h-screen text-slate-900 pb-20">
 
   <!-- Header -->
-  <header class="bg-white border-b-4 border-slate-900 sticky top-0 z-50">
+  <header class="bg-white/90 backdrop-blur-md border-b-2 border-slate-900 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
       
       <!-- Logo Container -->
-      <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.reload()">
-        <img src="favicon.png" alt="DupeSpotter Logo" class="h-12 w-auto object-contain hover:scale-105 transition-transform" />
+      <div class="flex items-center gap-3 cursor-pointer group" onclick="window.location.reload()">
+        <img src="favicon.png" alt="DupeSpotter Logo" class="h-16 w-auto object-contain group-hover:scale-105 transition-transform" />
       </div>
       
       <!-- Top Navigation Links -->
-      <div class="flex items-center gap-6 font-bold text-slate-700 text-sm">
-        <a href="#" class="hover:text-pink-600">Features</a>
-        <a href="#" class="hover:text-pink-600">About</a>
-        <a href="#" class="hover:text-pink-600">Blog</a>
-        <a href="#" class="hover:text-pink-600">API</a>
-        <a href="#" class="hover:text-pink-600">Contact</a>
+      <div class="flex items-center gap-6 font-bold text-slate-600 text-sm">
+        <a href="#" class="hover:text-pink-600 transition-colors">Features</a>
+        <a href="#" class="hover:text-pink-600 transition-colors">About</a>
+        <a href="#" class="hover:text-pink-600 transition-colors">Blog</a>
+        <a href="#" class="hover:text-pink-600 transition-colors">API</a>
+        <a href="#" class="hover:text-pink-600 transition-colors">Contact</a>
       </div>
 
-      <button class="cartoony-button bg-yellow-300 font-bold px-4 py-2 rounded-2xl flex items-center gap-2 text-sm">
+      <div class="cartoony-button bg-yellow-300 font-extrabold px-4 py-2 rounded-xl flex items-center gap-2 text-xs tracking-wide">
         <span>🎨 dbestguy productions</span>
-      </button>
+      </div>
     </div>
 
-    <!-- Vinted-Style Hover Navigation Bar with Expanded Sizes -->
-    <div class="border-t-2 border-slate-200 bg-slate-50 py-2 px-6">
-      <div id="vinted-categories" class="max-w-7xl mx-auto flex items-center justify-center sm:justify-start gap-6 font-black text-slate-700 text-sm overflow-x-visible">
+    <!-- Category Hover Navigation Bar -->
+    <div class="border-t border-slate-200 bg-white/50 backdrop-blur-sm py-2.5 px-6">
+      <div id="vinted-categories" class="max-w-7xl mx-auto flex items-center justify-center sm:justify-start gap-6 font-extrabold text-slate-700 text-xs tracking-wide overflow-x-visible">
         
         <!-- Women Dropdown -->
-        <div class="relative group py-2">
+        <div class="relative group py-1">
           <button data-gender="women" class="hover:text-pink-600 transition-colors flex items-center gap-1">
             Women ▾
           </button>
-          <div class="dropdown-content hidden group-hover:flex flex-col absolute left-0 top-full bg-white rounded-2xl p-3 w-56 z-50 text-xs gap-1">
-            <span class="text-slate-400 font-black text-[10px] uppercase px-2 pt-1">Clothing Sizes</span>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="women" data-size="XXS">XXS / UK 4 / US 0</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="women" data-size="XS">XS / UK 6 / US 2</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="women" data-size="S">S / UK 8 / US 4</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="women" data-size="M">M / UK 10 / US 6</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="women" data-size="L">L / UK 12 / US 8</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="women" data-size="XL">XL / UK 14 / US 10</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="women" data-size="2XL">2XL / UK 16 / US 12</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="women" data-size="3XL">3XL / UK 18 / US 14</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="women" data-size="Plus Size">4XL+ / Plus Size</button>
+          <div class="dropdown-content hidden group-hover:flex flex-col absolute left-0 top-full bg-white rounded-xl p-2.5 w-56 z-50 text-xs gap-1 shadow-xl">
+            <span class="text-slate-400 font-black text-[9px] uppercase tracking-wider px-2 pt-1">Clothing Sizes</span>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="women" data-size="XXS">XXS / UK 4 / US 0</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="women" data-size="XS">XS / UK 6 / US 2</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="women" data-size="S">S / UK 8 / US 4</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="women" data-size="M">M / UK 10 / US 6</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="women" data-size="L">L / UK 12 / US 8</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="women" data-size="XL">XL / UK 14 / US 10</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="women" data-size="2XL">2XL / UK 16 / US 12</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="women" data-size="Plus Size">4XL+ / Plus Size</button>
           </div>
         </div>
 
         <!-- Men Dropdown -->
-        <div class="relative group py-2">
+        <div class="relative group py-1">
           <button data-gender="men" class="hover:text-pink-600 transition-colors flex items-center gap-1">
             Men ▾
           </button>
-          <div class="dropdown-content hidden group-hover:flex flex-col absolute left-0 top-full bg-white rounded-2xl p-3 w-52 z-50 text-xs gap-1">
-            <span class="text-slate-400 font-black text-[10px] uppercase px-2 pt-1">Clothing Sizes</span>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="men" data-size="XS">Extra Small (XS)</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="men" data-size="S">Small (S)</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="men" data-size="M">Medium (M)</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="men" data-size="L">Large (L)</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="men" data-size="XL">X-Large (XL)</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="men" data-size="2XL">2X-Large (2XL)</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="men" data-size="3XL">3X-Large (3XL)</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="men" data-size="4XL">4XL / Big & Tall</button>
+          <div class="dropdown-content hidden group-hover:flex flex-col absolute left-0 top-full bg-white rounded-xl p-2.5 w-52 z-50 text-xs gap-1 shadow-xl">
+            <span class="text-slate-400 font-black text-[9px] uppercase tracking-wider px-2 pt-1">Clothing Sizes</span>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="men" data-size="XS">Extra Small (XS)</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="men" data-size="S">Small (S)</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="men" data-size="M">Medium (M)</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="men" data-size="L">Large (L)</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="men" data-size="XL">X-Large (XL)</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="men" data-size="2XL">2X-Large (2XL)</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="men" data-size="3XL">3X-Large (3XL)</button>
           </div>
         </div>
 
         <!-- Kids Dropdown -->
-        <div class="relative group py-2">
+        <div class="relative group py-1">
           <button data-gender="kids" class="hover:text-pink-600 transition-colors flex items-center gap-1">
             Kids ▾
           </button>
-          <div class="dropdown-content hidden group-hover:flex flex-col absolute left-0 top-full bg-white rounded-2xl p-3 w-56 z-50 text-xs gap-1">
-            <span class="text-slate-400 font-black text-[10px] uppercase px-2 pt-1">Age & Kids Sizes</span>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="kids" data-size="Newborn">Newborn / 0-3 Months</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="kids" data-size="3-6M">3-6 Months</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="kids" data-size="6-12M">6-12 Months</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="kids" data-size="12-18M">12-18 Months</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="kids" data-size="1-2 Yrs">1-2 Years (Toddler)</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="kids" data-size="3-4 Yrs">3-4 Years</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="kids" data-size="5-6 Yrs">5-6 Years</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="kids" data-size="7-8 Yrs">7-8 Years</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="kids" data-size="9-10 Yrs">9-10 Years</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="kids" data-size="11-12 Yrs">11-12 Years</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-gender="kids" data-size="13-15 Yrs">13-15 Years (Teens)</button>
+          <div class="dropdown-content hidden group-hover:flex flex-col absolute left-0 top-full bg-white rounded-xl p-2.5 w-56 z-50 text-xs gap-1 shadow-xl">
+            <span class="text-slate-400 font-black text-[9px] uppercase tracking-wider px-2 pt-1">Age & Kids Sizes</span>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="kids" data-size="Newborn">Newborn / 0-3M</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="kids" data-size="6-12M">6-12 Months</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="kids" data-size="1-2 Yrs">1-2 Years (Toddler)</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="kids" data-size="5-6 Yrs">5-6 Years</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="kids" data-size="9-10 Yrs">9-10 Years</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-gender="kids" data-size="13-15 Yrs">13-15 Years (Teens)</button>
           </div>
         </div>
 
         <!-- Shoes Dropdown -->
-        <div class="relative group py-2">
+        <div class="relative group py-1">
           <button data-category="shoes" class="hover:text-pink-600 transition-colors flex items-center gap-1">
             Shoes ▾
           </button>
-          <div class="dropdown-content hidden group-hover:flex flex-col absolute left-0 top-full bg-white rounded-2xl p-3 w-60 z-50 text-xs gap-1">
-            <span class="text-slate-400 font-black text-[10px] uppercase px-2 pt-1">Shoe Sizes (EU / UK / US)</span>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="35">EUR 35 / UK 2.5 / US 5W</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="36">EUR 36 / UK 3 / US 5.5W</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="36.5">EUR 36.5 / UK 3.5 / US 6W</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="37.5">EUR 37.5 / UK 4 / US 6.5W</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="38">EUR 38 / UK 4.5 / US 7W</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="38.5">EUR 38.5 / UK 5 / US 7.5W (5.5M)</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="39">EUR 39 / UK 5.5 / US 8W (6M)</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="40">EUR 40 / UK 6 / US 8.5W (6.5M)</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="40.5">EUR 40.5 / UK 6.5 / US 7.5M</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="41">EUR 41 / UK 7 / US 8M</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="42">EUR 42 / UK 7.5 / US 8.5M</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="42.5">EUR 42.5 / UK 8 / US 9M</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="43">EUR 43 / UK 8.5 / US 9.5M</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="44">EUR 44 / UK 9 / US 10M</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="44.5">EUR 44.5 / UK 9.5 / US 10.5M</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="45">EUR 45 / UK 10 / US 11M</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="46">EUR 46 / UK 11 / US 12M</button>
-            <button class="size-opt text-left px-2 py-1 hover:bg-pink-100 rounded-lg font-bold" data-category="shoes" data-size="47">EUR 47+ / UK 12+ / US 13M+</button>
+          <div class="dropdown-content hidden group-hover:flex flex-col absolute left-0 top-full bg-white rounded-xl p-2.5 w-60 z-50 text-xs gap-1 shadow-xl">
+            <span class="text-slate-400 font-black text-[9px] uppercase tracking-wider px-2 pt-1">Shoe Sizes (EU / UK / US)</span>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-category="shoes" data-size="36">EUR 36 / UK 3 / US 5.5W</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-category="shoes" data-size="38">EUR 38 / UK 4.5 / US 7W</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-category="shoes" data-size="39">EUR 39 / UK 5.5 / US 8W</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-category="shoes" data-size="40">EUR 40 / UK 6 / US 8.5W</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-category="shoes" data-size="41">EUR 41 / UK 7 / US 8M</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-category="shoes" data-size="42">EUR 42 / UK 7.5 / US 8.5M</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-category="shoes" data-size="43">EUR 43 / UK 8.5 / US 9.5M</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-category="shoes" data-size="44">EUR 44 / UK 9 / US 10M</button>
+            <button class="size-opt text-left px-2.5 py-1.5 hover:bg-pink-100 rounded-lg font-bold transition-colors" data-category="shoes" data-size="45">EUR 45 / UK 10 / US 11M</button>
           </div>
         </div>
 
-        <!-- Direct Category Buttons -->
-        <button data-category="designer" class="hover:text-pink-600 transition-colors py-2">Designer</button>
-        <button data-category="furniture" class="hover:text-pink-600 transition-colors py-2">Home & Furniture</button>
-        <button data-category="tech" class="hover:text-pink-600 transition-colors py-2">Electronics</button>
-        <button data-category="sports" class="hover:text-pink-600 transition-colors py-2">Sports & Collectibles</button>
+        <button data-category="designer" class="hover:text-pink-600 transition-colors py-1">Designer</button>
+        <button data-category="furniture" class="hover:text-pink-600 transition-colors py-1">Home & Furniture</button>
+        <button data-category="tech" class="hover:text-pink-600 transition-colors py-1">Electronics</button>
+        <button data-category="sports" class="hover:text-pink-600 transition-colors py-1">Sports & Collectibles</button>
 
       </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 mt-8">
-    <!-- Search Bar Container -->
-    <div class="max-w-3xl mx-auto mb-10 space-y-4">
+  <main class="max-w-7xl mx-auto px-4 mt-10">
+    <!-- Hero / Search Bar Container -->
+    <div class="max-w-3xl mx-auto mb-12 space-y-6 text-center">
+      <div class="space-y-2">
+        <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">Find the Best Deals & Cheap Dupes Instantly</h1>
+        <p class="text-slate-600 font-bold text-sm">Compare high-end tech, sneakers, and clothing across the web effortlessly.</p>
+      </div>
+
       <form id="search-form" class="flex flex-col sm:flex-row gap-3">
         <input 
           type="text" 
           id="search-input"
-          placeholder="Search for Nintendo Switch, Nike Dunks, Airpods..." 
-          class="cartoony-input flex-1 px-5 py-4 rounded-2xl text-lg font-bold bg-white focus:outline-none focus:ring-4 focus:ring-yellow-300"
+          placeholder="Search Nintendo Switch, Nike Dunks, AirPods..." 
+          class="cartoony-input flex-1 px-5 py-4 rounded-2xl text-base font-bold bg-white focus:outline-none"
           required
         />
         <button 
           type="submit" 
-          class="cartoony-button bg-pink-500 hover:bg-pink-600 text-white font-black text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-2"
+          class="cartoony-button bg-pink-500 hover:bg-pink-600 text-white font-black text-base px-8 py-4 rounded-2xl flex items-center justify-center gap-2"
         >
           <span>Search Deals</span> 🔍
         </button>
       </form>
 
       <!-- Active Filter Selectors + Clear Option -->
-      <div class="flex flex-wrap items-center justify-center gap-3 text-sm font-bold pt-1">
-        <div class="flex items-center gap-2">
-          <label for="gender-select">Category:</label>
-          <select id="gender-select" class="cartoony-input bg-white px-3 py-1.5 rounded-xl text-sm font-bold">
+      <div class="flex flex-wrap items-center justify-center gap-3 text-xs font-bold pt-1">
+        <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-xl cartoony-input">
+          <label for="gender-select" class="text-slate-500 uppercase tracking-wide text-[10px]">Category:</label>
+          <select id="gender-select" class="bg-transparent font-black focus:outline-none cursor-pointer">
             <option value="">All Categories</option>
             <option value="women">Women's</option>
             <option value="men">Men's</option>
@@ -197,63 +202,42 @@
           </select>
         </div>
 
-        <div class="flex items-center gap-2">
-          <label for="size-select">Size:</label>
-          <select id="size-select" class="cartoony-input bg-white px-3 py-1.5 rounded-xl text-sm font-bold max-w-[180px]">
+        <div class="flex items-center gap-2 bg-white px-3 py-2 rounded-xl cartoony-input">
+          <label for="size-select" class="text-slate-500 uppercase tracking-wide text-[10px]">Size:</label>
+          <select id="size-select" class="bg-transparent font-black focus:outline-none cursor-pointer max-w-[150px]">
             <option value="">Any Size</option>
-            <!-- Shoe Sizes -->
             <optgroup label="👟 Shoe Sizes">
-              <option value="35">EUR 35 / UK 2.5</option>
               <option value="36">EUR 36 / UK 3</option>
-              <option value="36.5">EUR 36.5 / UK 3.5</option>
-              <option value="37.5">EUR 37.5 / UK 4</option>
               <option value="38">EUR 38 / UK 4.5</option>
-              <option value="38.5">EUR 38.5 / UK 5 (5.5M)</option>
               <option value="39">EUR 39 / UK 5.5</option>
               <option value="40">EUR 40 / UK 6</option>
-              <option value="40.5">EUR 40.5 / UK 6.5</option>
               <option value="41">EUR 41 / UK 7</option>
               <option value="42">EUR 42 / UK 7.5</option>
-              <option value="42.5">EUR 42.5 / UK 8</option>
               <option value="43">EUR 43 / UK 8.5</option>
               <option value="44">EUR 44 / UK 9</option>
               <option value="45">EUR 45 / UK 10</option>
-              <option value="46">EUR 46 / UK 11</option>
             </optgroup>
-            <!-- Clothing Sizes -->
             <optgroup label="👕 Clothing Sizes">
-              <option value="XXS">XXS</option>
               <option value="XS">XS</option>
               <option value="S">Small (S)</option>
               <option value="M">Medium (M)</option>
               <option value="L">Large (L)</option>
               <option value="XL">XL</option>
-              <option value="2XL">2XL</option>
-              <option value="3XL">3XL</option>
-            </optgroup>
-            <!-- Kids Sizes -->
-            <optgroup label="🧒 Kids Sizes">
-              <option value="Baby">Baby / Infant</option>
-              <option value="Toddler">Toddler (1-3 Yrs)</option>
-              <option value="5-6 Yrs">Kids (5-6 Yrs)</option>
-              <option value="7-8 Yrs">Kids (7-8 Yrs)</option>
-              <option value="9-10 Yrs">Kids (9-10 Yrs)</option>
-              <option value="Teens">Teens (11-15 Yrs)</option>
             </optgroup>
           </select>
         </div>
 
         <!-- Clear Filters Button -->
-        <button id="clear-filters-btn" class="cartoony-button bg-red-400 hover:bg-red-500 text-white font-black px-3 py-1.5 rounded-xl text-xs flex items-center gap-1">
+        <button id="clear-filters-btn" class="cartoony-button bg-red-400 hover:bg-red-500 text-white font-black px-3 py-2.5 rounded-xl text-xs flex items-center gap-1 transition-colors">
           <span>✖ Clear Filters</span>
         </button>
       </div>
 
       <!-- Recent Searches Header & Clear Button -->
-      <div id="recent-searches" class="flex flex-wrap items-center justify-center gap-2 text-sm font-bold">
+      <div id="recent-searches" class="flex flex-wrap items-center justify-center gap-2 text-sm font-bold pt-2">
         <div class="flex items-center gap-1.5">
-          <span class="text-slate-500 text-xs font-black uppercase">Recent:</span>
-          <button id="clear-recents-btn" class="cartoony-button bg-red-500 hover:bg-red-600 text-white font-black text-[10px] px-2 py-0.5 rounded-lg flex items-center gap-1">
+          <span class="text-slate-400 text-[10px] font-black uppercase tracking-wider">Recent:</span>
+          <button id="clear-recents-btn" class="cartoony-button bg-slate-200 hover:bg-red-500 hover:text-white text-slate-700 font-black text-[10px] px-2 py-0.5 rounded-md transition-colors">
             🗑️ Clear
           </button>
         </div>
@@ -265,49 +249,49 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
       
       <!-- Left Sidebar: Filter By -->
-      <aside id="filter-container" class="bg-white p-6 rounded-3xl cartoony-card h-fit space-y-4">
-        <h2 class="text-xl font-black text-slate-900 mb-4 flex items-center gap-2">
+      <aside id="filter-container" class="bg-white/80 backdrop-blur-md p-5 rounded-3xl cartoony-card h-fit space-y-4">
+        <h2 class="text-base font-black text-slate-900 mb-3 flex items-center gap-2 border-b border-slate-100 pb-3">
           ⚙️ Filter By
         </h2>
 
-        <div class="space-y-3">
-          <button data-filter="all" class="w-full text-left cartoony-button bg-blue-500 text-white font-black px-4 py-3 rounded-2xl flex items-center gap-2 ring-4 ring-slate-900 scale-105">
-            <span class="w-5 h-5 rounded-full bg-white border-2 border-slate-900 flex items-center justify-center text-xs text-slate-900">✓</span>
+        <div class="space-y-2.5">
+          <button data-filter="all" class="w-full text-left cartoony-button bg-blue-500 text-white font-black px-3.5 py-2.5 rounded-xl flex items-center gap-2.5 text-xs shadow-sm">
+            <span class="w-4 h-4 rounded-full bg-white border-2 border-slate-900 flex items-center justify-center text-[10px] text-slate-900">✓</span>
             All Deals
           </button>
 
-          <button data-filter="trending" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
+          <button data-filter="trending" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-800 font-black px-3.5 py-2.5 rounded-xl flex items-center gap-2.5 text-xs">
+            <span class="w-4 h-4 rounded-full border-2 border-slate-900"></span>
             🔥 Trending Now
           </button>
 
-          <button data-filter="low-to-high" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
+          <button data-filter="low-to-high" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-800 font-black px-3.5 py-2.5 rounded-xl flex items-center gap-2.5 text-xs">
+            <span class="w-4 h-4 rounded-full border-2 border-slate-900"></span>
             📉 Low to High
           </button>
 
-          <button data-filter="high-to-low" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
+          <button data-filter="high-to-low" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-800 font-black px-3.5 py-2.5 rounded-xl flex items-center gap-2.5 text-xs">
+            <span class="w-4 h-4 rounded-full border-2 border-slate-900"></span>
             📈 High to Low
           </button>
 
-          <button data-filter="new" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
+          <button data-filter="new" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-800 font-black px-3.5 py-2.5 rounded-xl flex items-center gap-2.5 text-xs">
+            <span class="w-4 h-4 rounded-full border-2 border-slate-900"></span>
             ✨ Brand New
           </button>
 
-          <button data-filter="used" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
+          <button data-filter="used" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-800 font-black px-3.5 py-2.5 rounded-xl flex items-center gap-2.5 text-xs">
+            <span class="w-4 h-4 rounded-full border-2 border-slate-900"></span>
             ♻️ Used / Pre-Loved
           </button>
 
-          <button data-filter="dupe" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
+          <button data-filter="dupe" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-800 font-black px-3.5 py-2.5 rounded-xl flex items-center gap-2.5 text-xs">
+            <span class="w-4 h-4 rounded-full border-2 border-slate-900"></span>
             🪄 Cheap Alternative
           </button>
 
-          <button data-filter="real" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
+          <button data-filter="real" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-800 font-black px-3.5 py-2.5 rounded-xl flex items-center gap-2.5 text-xs">
+            <span class="w-4 h-4 rounded-full border-2 border-slate-900"></span>
             💎 Authentic / Real
           </button>
         </div>
@@ -315,15 +299,15 @@
 
       <!-- Right Column: Results Grid -->
       <section class="md:col-span-3">
-        <div id="loading-spinner" class="hidden text-center py-16">
-          <div class="inline-block animate-spin text-5xl mb-3">🌀</div>
-          <p class="text-xl font-black text-slate-700">Hunting down eBay listings & store deals...</p>
+        <div id="loading-spinner" class="hidden text-center py-20">
+          <div class="inline-block animate-spin text-4xl mb-3">🌀</div>
+          <p class="text-base font-black text-slate-700">Hunting down eBay listings & store deals...</p>
         </div>
 
-        <div id="no-results" class="hidden text-center py-16 bg-white rounded-3xl cartoony-card max-w-md mx-auto">
-          <div class="text-5xl mb-3">🛋️</div>
-          <h3 class="text-2xl font-black mb-2">No Deals Found</h3>
-          <p class="text-slate-600 font-bold px-4">Try searching with simpler terms!</p>
+        <div id="no-results" class="hidden text-center py-16 bg-white/80 backdrop-blur-md rounded-3xl cartoony-card max-w-md mx-auto">
+          <div class="text-4xl mb-3">🛋️</div>
+          <h3 class="text-xl font-black mb-2">No Deals Found</h3>
+          <p class="text-slate-600 font-bold text-xs px-4">Try searching with simpler terms!</p>
         </div>
 
         <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
