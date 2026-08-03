@@ -8,23 +8,24 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultsGrid = document.getElementById("results-grid");
   const filterContainer = document.getElementById("filter-container");
   const recentTagsContainer = document.getElementById("recent-tags");
-  const categoryPills = document.querySelectorAll("#category-pills button");
+  const vintedCategories = document.querySelectorAll("#vinted-categories button");
 
   let allItems = [];
   let currentFilter = 'all';
-  let selectedCategory = '';
+  let activeCategory = '';
 
-  // --- Category Pill Clicks ---
-  categoryPills.forEach(pill => {
-    pill.addEventListener("click", () => {
-      categoryPills.forEach(p => p.classList.remove("ring-4", "ring-slate-900", "scale-105"));
+  // --- Vinted Category Clicks ---
+  vintedCategories.forEach(btn => {
+    btn.addEventListener("click", () => {
+      vintedCategories.forEach(b => b.classList.remove("text-pink-600", "underline"));
       
-      const cat = pill.dataset.category;
-      if (selectedCategory === cat) {
-        selectedCategory = ''; // Toggle off
-      } else {
-        selectedCategory = cat;
-        pill.classList.add("ring-4", "ring-slate-900", "scale-105");
+      btn.classList.add("text-pink-600", "underline");
+
+      if (btn.dataset.gender) {
+        if (genderSelect) genderSelect.value = btn.dataset.gender;
+      }
+      if (btn.dataset.category) {
+        activeCategory = btn.dataset.category;
       }
 
       if (searchInput.value.trim()) {
@@ -67,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   loadRecentSearches();
 
-  // --- Sidebar Button Selection ---
+  // --- Sidebar Selection ---
   if (filterContainer) {
     const filterButtons = filterContainer.querySelectorAll("button[data-filter]");
     
@@ -110,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const gender = genderSelect ? genderSelect.value : '';
       const size = sizeInput ? sizeInput.value.trim() : '';
 
-      const url = `/api/search?query=${encodeURIComponent(rawQuery)}&category=${encodeURIComponent(selectedCategory)}&gender=${encodeURIComponent(gender)}&size=${encodeURIComponent(size)}`;
+      const url = `/api/search?query=${encodeURIComponent(rawQuery)}&category=${encodeURIComponent(activeCategory)}&gender=${encodeURIComponent(gender)}&size=${encodeURIComponent(size)}`;
       
       const response = await fetch(url);
       const data = await response.json();
@@ -125,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return match ? parseFloat(match[0]) : Infinity;
       }
 
-      // Default sort by lowest price so $5 eBay listings jump right to the top
+      // Default sort lowest to highest
       allItems.sort((a, b) => extractPrice(a.price) - extractPrice(b.price));
 
       if (allItems.length === 0) {
@@ -147,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Apply Filters & Badging ---
+  // --- Apply Filters ---
   function applyFilter(type) {
     currentFilter = type;
     if (!allItems.length) return;
@@ -199,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderResults(filtered.length > 0 ? filtered : allItems, type);
   }
 
-  // --- Render Results Grid ---
+  // --- Render Product Cards ---
   function renderResults(items, activeType) {
     if (!resultsGrid) return;
     resultsGrid.innerHTML = "";
