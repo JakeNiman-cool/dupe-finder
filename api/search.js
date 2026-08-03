@@ -1,24 +1,22 @@
 export default async function handler(req, res) {
   try {
     const query = req.query.query || 'trending deals';
-    console.log(`[Vercel Search API] Fetching live results for: "${query}"`);
+    console.log(`[Vercel Search API] Fetching wide results for: "${query}"`);
 
-    // Fetch real shopping results using a public JSON search endpoint
-    const encodedQuery = encodeURIComponent(`${query} site:ebay.co.uk OR site:vinted.co.uk`);
+    // Fetch open shopping and general results without site restrictions
+    const encodedQuery = encodeURIComponent(`${query} buy online cheap deal`);
     const response = await fetch(`https://html.duckduckgo.com/html/?q=${encodedQuery}`);
     const htmlText = await response.text();
 
-    // Parse links and titles from duckduckgo html results as a lightweight fallback scraper
     const results = [];
     const regex = /<a class="result__url" href="([^"]+)"[^>]*>(.*?)<\/a>.*?<a class="result__snippet"[^>]*>(.*?)<\/a>/gs;
     let match;
 
-    while ((match = regex.exec(htmlText)) && results.length < 20) {
+    while ((match = regex.exec(htmlText)) && results.length < 30) {
       const link = match[1];
       const title = match[2].replace(/<[^>]*>?/gm, '').trim();
       const snippet = match[3].replace(/<[^>]*>?/gm, '').trim();
 
-      // Try to extract a price from the snippet (e.g., £15.00 or $20)
       const priceMatch = snippet.match(/(?:£|\$|€)\d+(?:\.\d{2})?/);
       const price = priceMatch ? priceMatch[0] : 'Check site';
 
@@ -26,7 +24,18 @@ export default async function handler(req, res) {
       const lowerLink = link.toLowerCase();
       if (lowerLink.includes('ebay')) source = 'eBay';
       else if (lowerLink.includes('vinted')) source = 'Vinted';
+      else if (lowerLink.includes('amazon')) source = 'Amazon';
+      else if (lowerLink.includes('etsy')) source = 'Etsy';
       else if (lowerLink.includes('depop')) source = 'Depop';
+      else {
+        try {
+          const urlObj = new URL(link.startsWith('http') ? link : `https://${link}`);
+          source = urlObj.hostname.replace('www.', '').split('.')[0];
+          source = source.charAt(0).toUpperCase() + source.slice(1);
+        } catch {
+          source = 'Online Store';
+        }
+      }
 
       if (title && link) {
         results.push({
@@ -39,21 +48,13 @@ export default async function handler(req, res) {
       }
     }
 
-    // If scraping yields nothing, return helpful guidance items matching the query
     const finalShopping = results.length > 0 ? results : [
       {
-        title: `Search results for ${query} on eBay`,
-        price: "View Live",
-        source: "eBay",
-        link: `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponent(query)}`,
+        title: `Explore global listings for ${query}`,
+        price: "Check web",
+        source: "Aggregator",
+        link: `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`,
         thumbnail: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?w=300"
-      },
-      {
-        title: `Search results for ${query} on Vinted`,
-        price: "View Live",
-        source: "Vinted",
-        link: `https://www.vinted.co.uk/catalog?search_text=${encodeURIComponent(query)}`,
-        thumbnail: "https://images.unsplash.com/photo-1445205170230-053b83016050?w=300"
       }
     ];
 
