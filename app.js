@@ -35,50 +35,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
         allItems = data.shopping || [];
 
-        function extractPrice(priceStr) {
-          if (!priceStr) return Infinity;
-          const match = priceStr.replace(/[^0-9.]/g, '').match(/[\d.]+/);
-          return match ? parseFloat(match[0]) : Infinity;
-        }
-
-        // Filter out expensive resale platforms
-        const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods', '1stdibs'];
-        allItems = allItems.filter(item => {
-          const sourceName = (item.source || '').toLowerCase();
-          return !excludedSources.some(exc => sourceName.includes(exc));
-        });
-
-        // Advanced sorting: Prioritize bargain marketplace sources (eBay, Vinted) and absolute lowest prices
+        // Sort items by price low to high
         allItems.sort((a, b) => {
-          const priceA = extractPrice(a.price);
-          const priceB = extractPrice(b.price);
-
-          const sourceA = (a.source || '').toLowerCase();
-          const sourceB = (b.source || '').toLowerCase();
-          
-          const isBargainMarketplace = (s) => s.includes('ebay') || s.includes('vinted') || s.includes('depop') || s.includes('mercari');
-          const marketA = isBargainMarketplace(sourceA) ? 1 : 0;
-          const marketB = isBargainMarketplace(sourceB) ? 1 : 0;
-
-          if (Math.abs(priceA - priceB) < (Math.min(priceA, priceB) * 0.25)) {
-            if (marketA !== marketB) {
-              return marketB - marketA;
-            }
-          }
-
-          return priceA - priceB;
+          const getNum = p => {
+            const m = (p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
+            return m ? parseFloat(m[0]) : Infinity;
+          };
+          return getNum(a.price) - getNum(b.price);
         });
 
         if (allItems.length === 0) {
           if (noResults) noResults.classList.remove("hidden");
         } else {
           if (filterContainer) filterContainer.classList.remove("hidden");
-          applyFilter(currentFilter);
+          applyFilter('all'); // Default to showing all results first
         }
       } catch (error) {
         console.error("Search failed:", error);
         if (loadingSpinner) loadingSpinner.classList.add("hidden");
-        if (noResults) noResults.classList.add("hidden");
+        if (noResults) noResults.classList.remove("hidden");
       }
     });
   }
@@ -88,30 +63,23 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!allItems.length) return;
 
     let filtered = [...allItems];
-    const textMatch = (item, keywords) => {
-      const text = (item.title + ' ' + (item.source || '')).toLowerCase();
-      return keywords.some(k => text.includes(k));
-    };
 
+    // Safe filtering that doesn't completely empty out results if keywords are missing
     if (type === 'new') {
-      filtered = filtered.filter(i => textMatch(i, ['new', 'brand new', 'factory', 'sealed']));
+      const matchNew = allItems.filter(i => (i.title + ' ' + (i.source || '')).toLowerCase().match(/new|sealed|fresh/));
+      filtered = matchNew.length > 0 ? matchNew : allItems;
     } else if (type === 'used') {
-      filtered = filtered.filter(i => textMatch(i, ['used', 'pre-owned', 'second hand', 'vintage', 'refurbished', 'ebay', 'vinted', '70s', '1970']));
+      const matchUsed = allItems.filter(i => (i.title + ' ' + (i.source || '')).toLowerCase().match(/used|pre-owned|vintage|second|thrift|vinted|ebay/));
+      filtered = matchUsed.length > 0 ? matchUsed : allItems;
     } else if (type === 'dupe') {
-      filtered = filtered.filter(i => textMatch(i, ['dupe', 'alternative', 'style', 'inspired', 'replica']));
+      const matchDupe = allItems.filter(i => (i.title + ' ' + (i.source || '')).toLowerCase().match(/dupe|alternative|style|inspired|replica/));
+      filtered = matchDupe.length > 0 ? matchDupe : allItems;
     } else if (type === 'real') {
-      filtered = filtered.filter(i => textMatch(i, ['authentic', 'real', 'original', 'genuine']));
+      const matchReal = allItems.filter(i => (i.title + ' ' + (i.source || '')).toLowerCase().match(/authentic|real|original|genuine/));
+      filtered = matchReal.length > 0 ? matchReal : allItems;
     }
 
-    filtered.sort((a, b) => {
-      const getNum = p => {
-        const m = (p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
-        return m ? parseFloat(m[0]) : Infinity;
-      };
-      return getNum(a.price) - getNum(b.price);
-    });
-
-    renderResults(filtered.length > 0 ? filtered : allItems);
+    renderResults(filtered);
   };
 
   function renderResults(items) {
@@ -127,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     items.forEach((item, index) => {
       const card = document.createElement("div");
-      card.className = "cartoony-card bg-white rounded-3xl p-5 flex flex-col justify-between relative transition-all duration-200";
+      card.className = "cartoony-card bg-white rounded-3xl p-5 flex flex-col justify-between relative transition-all duration-200 border-3 border-slate-900 shadow-[4px_4px_0px_#1e293b]";
       
       const imageUrl = item.imageUrl || item.thumbnail || item.image || item.photo;
 
@@ -156,14 +124,14 @@ document.addEventListener("DOMContentLoaded", () => {
         <div>
           ${badgeHTML}
           ${imageSection}
-          <h3 class="text-slate-900 hover:text-pink-600 transition-colors mb-2 line-clamp-2 text-lg">
+          <h3 class="text-slate-900 font-bold hover:text-pink-600 transition-colors mb-2 line-clamp-2 text-lg">
             <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
           </h3>
-          <p class="text-pink-600 text-2xl mb-3">${item.price || "Check site for price"}</p>
+          <p class="text-pink-600 font-black text-2xl mb-3">${item.price || "Check site for price"}</p>
         </div>
         <div class="pt-4 border-t-2 border-slate-100 flex items-center justify-between text-sm">
-          <span class="bg-purple-100 text-purple-700 px-3 py-1.5 rounded-xl border-2 border-slate-900 truncate max-w-[120px]">${item.source || "Store"}</span>
-          <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="cartoony-button px-4 py-2 bg-yellow-300 text-slate-900 rounded-xl hover:bg-yellow-400">
+          <span class="bg-purple-100 text-purple-700 font-bold px-3 py-1.5 rounded-xl border-2 border-slate-900 truncate max-w-[120px]">${item.source || "Store"}</span>
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="cartoony-button px-4 py-2 bg-yellow-300 text-slate-900 font-black rounded-xl border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b] hover:bg-yellow-400">
             Grab Deal 🛒
           </a>
         </div>
