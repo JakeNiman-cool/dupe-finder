@@ -1,67 +1,112 @@
-async function searchDupes() {
-  const searchInput = document.getElementById('searchInput');
-  const resultsContainer = document.getElementById('resultsContainer');
-  const query = searchInput ? searchInput.value.trim() : '';
+document.addEventListener('DOMContentLoaded', () => {
+  // 1. DOM Elements - Ensure these IDs match your index.html
+  const searchForm = document.getElementById('search-form');
+  const searchInput = document.getElementById('search-input');
+  const resultsGrid = document.getElementById('results-grid');
+  const loadingSpinner = document.getElementById('loading-spinner');
+  const noResultsMsg = document.getElementById('no-results');
 
-  if (!query) {
-    alert('Please enter a brand or product name to search!');
+  if (!searchForm || !searchInput) {
+    console.error('Search form or input element missing from HTML!');
     return;
   }
 
-  // Show skeleton loader or loading state
-  if (resultsContainer) {
-    resultsContainer.innerHTML = '<p class="text-center text-gray-400 py-8">Scanning stores for the best dupes...</p>';
+  // 2. Handle Form Submission
+  searchForm.addEventListener('submit', async (e) => {
+    // PREVENT PAGE RELOAD
+    e.preventDefault();
+
+    const query = searchInput.value.trim();
+    if (!query) return;
+
+    // Reset UI State
+    if (resultsGrid) resultsGrid.innerHTML = '';
+    if (noResultsMsg) noResultsMsg.classList.add('hidden');
+    if (loadingSpinner) loadingSpinner.classList.remove('hidden');
+
+    try {
+      // 3. Call your Netlify serverless search function
+      const response = await fetch(`/.netlify/functions/search?q=${encodeURIComponent(query)}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      // Hide loading spinner
+      if (loadingSpinner) loadingSpinner.classList.add('hidden');
+
+      // 4. Render or Display Error
+      if (data.results && data.results.length > 0) {
+        renderResults(data.results);
+      } else {
+        if (noResultsMsg) noResultsMsg.classList.remove('hidden');
+      }
+    } catch (error) {
+      console.error('Search request failed:', error);
+      if (loadingSpinner) loadingSpinner.classList.add('hidden');
+      if (noResultsMsg) {
+        noResultsMsg.innerText = 'Failed to load search results. Please try again.';
+        noResultsMsg.classList.remove('hidden');
+      }
+    }
+  });
+
+  // 5. Function to Render Product Cards
+  function renderResults(products) {
+    if (!resultsGrid) return;
+
+    resultsGrid.innerHTML = products.map((product) => `
+      <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-lg hover:border-purple-500 transition-all duration-200 flex flex-col">
+        <div class="w-full h-48 bg-slate-900 overflow-hidden flex items-center justify-center relative">
+          <img 
+            src="${product.image}" 
+            alt="${escapeHtml(product.title)}" 
+            class="w-full h-full object-contain p-4"
+            onerror="this.onerror=null; this.src='https://via.placeholder.com/200?text=No+Image';"
+          />
+        </div>
+        
+        <div class="p-4 flex flex-col flex-grow justify-between">
+          <div>
+            <span class="text-xs font-semibold uppercase tracking-wider text-purple-400">
+              ${escapeHtml(product.source)}
+            </span>
+            <h3 class="text-sm font-medium text-slate-100 mt-1 line-clamp-2 title="="${escapeHtml(product.title)}">
+              ${escapeHtml(product.title)}
+            </h3>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-700/60 flex items-center justify-between">
+            <span class="text-lg font-bold text-emerald-400">
+              ${escapeHtml(product.formattedPrice)}
+            </span>
+            <a 
+              href="${product.link}" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-lg transition-colors inline-flex items-center gap-1"
+            >
+              View Deal
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    `).join('');
   }
 
-  try {
-    const response = await fetch(`/.netlify/functions/search?q=${encodeURIComponent(query)}`);
-    const data = await response.json();
-
-    // If backend returned a specific error (e.g. SerpApi key issue)
-    if (!response.ok || data.error) {
-      console.error('Search API Error:', data.error || response.statusText);
-      alert(`Search error: ${data.error || 'Unable to complete search'}`);
-      if (resultsContainer) {
-        resultsContainer.innerHTML = `<p class="text-center text-red-400 py-8">${data.error || 'Unable to fetch results right now.'}</p>`;
-      }
-      return;
-    }
-
-    const results = data.results || [];
-
-    if (results.length === 0) {
-      if (resultsContainer) {
-        resultsContainer.innerHTML = '<p class="text-center text-gray-400 py-8">No dupes found for that term. Try another item or brand!</p>';
-      }
-      return;
-    }
-
-    // Render product cards
-    renderResults(results);
-
-  } catch (err) {
-    console.error('Network Error:', err);
-    alert('Unable to connect to the server. Please try again in a few seconds.');
+  // Utility helper to prevent HTML injection XSS issues
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
   }
-}
-
-function renderResults(products) {
-  const resultsContainer = document.getElementById('resultsContainer');
-  if (!resultsContainer) return;
-
-  resultsContainer.innerHTML = products.map(product => `
-    <div class="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 flex flex-col justify-between hover:border-purple-500/50 transition-all">
-      <img src="${product.image}" alt="${product.title}" class="w-full h-48 object-contain rounded-lg mb-4 bg-white/5 p-2" />
-      <div>
-        <span class="text-xs text-purple-400 font-semibold uppercase">${product.source}</span>
-        <h3 class="text-white font-medium text-sm line-clamp-2 mt-1 mb-2">${product.title}</h3>
-      </div>
-      <div class="mt-auto pt-3 flex items-center justify-between border-t border-slate-700/30">
-        <span class="text-lg font-bold text-emerald-400">${product.formattedPrice}</span>
-        <a href="${product.link}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-semibold rounded-lg transition-colors">
-          View Deal ↗
-        </a>
-      </div>
-    </div>
-  `).join('');
-}
+});
