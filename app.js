@@ -45,14 +45,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.createElement("div");
       card.className = "bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between hover:border-purple-500/50 transition-all shadow-lg group";
       
-      // Fallback placeholder image if item.thumbnail isn't present
-      const imageUrl = item.thumbnail || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&auto=format&fit=crop&q=60";
+      // Check for thumbnail or image property from API response
+      const imageUrl = item.thumbnail || item.image;
+
+      // Only generate the image HTML block if an image actually exists
+      const imageSection = imageUrl ? `
+        <div class="w-full h-48 bg-slate-900/50 rounded-xl overflow-hidden mb-4 flex items-center justify-center p-2 border border-slate-700/50">
+          <img src="${imageUrl}" alt="${item.title}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300" />
+        </div>
+      ` : '';
 
       card.innerHTML = `
         <div>
-          <div class="w-full h-48 bg-slate-900/50 rounded-xl overflow-hidden mb-4 flex items-center justify-center p-2 border border-slate-700/50">
-            <img src="${imageUrl}" alt="${item.title}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300" />
-          </div>
+          ${imageSection}
           <h3 class="font-semibold text-slate-100 group-hover:text-purple-400 transition-colors mb-2 line-clamp-2">
             <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
           </h3>
