@@ -31,18 +31,17 @@ document.addEventListener("DOMContentLoaded", () => {
           return match ? parseFloat(match[0]) : Infinity;
         }
 
-        // Sort items to put the ones with images and lowest prices strictly on top
+        // Filter out expensive resale/luxury platforms to focus on budget choices
+        const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods'];
+        items = items.filter(item => {
+          const sourceName = (item.source || '').toLowerCase();
+          return !excludedSources.some(exc => sourceName.includes(exc));
+        });
+
+        // Sort items strictly by lowest price first
         items.sort((a, b) => {
-          const hasImageA = (a.imageUrl || a.thumbnail || a.image || a.photo) ? 1 : 0;
-          const hasImageB = (b.imageUrl || b.thumbnail || b.image || b.photo) ? 1 : 0;
-
-          if (hasImageA !== hasImageB) {
-            return hasImageB - hasImageA;
-          }
-
           const priceA = extractPrice(a.price);
           const priceB = extractPrice(b.price);
-
           return priceA - priceB;
         });
 
@@ -54,7 +53,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
         console.error("Search failed:", error);
         if (loadingSpinner) loadingSpinner.classList.add("hidden");
-        if (noResults) noResults.classList.add("hidden");
+        if (noResults) noResults.classList.remove("hidden");
       }
     });
   }
@@ -63,41 +62,23 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!resultsGrid) return;
     resultsGrid.innerHTML = "";
 
-    // Calculate the average or baseline price of these results to estimate savings
-    const validPrices = items.map(i => {
-      const m = (i.price || '').replace(/,/g, '').match(/[\d.]+/);
-      return m ? parseFloat(m[0]) : null;
-    }).filter(p => p !== null && p > 0);
-
-    const avgPrice = validPrices.length > 0 ? validPrices.reduce((a, b) => a + b, 0) / validPrices.length : 50;
-
     items.forEach((item, index) => {
       const card = document.createElement("div");
       card.className = "cartoony-card bg-white rounded-3xl p-5 flex flex-col justify-between relative";
       
       const imageUrl = item.imageUrl || item.thumbnail || item.image || item.photo;
 
-      // Determine extreme bargain tags based on position or price depth
       let badgeHTML = '';
-      const priceMatch = (item.price || '').replace(/,/g, '').match(/[\d.]+/);
-      const numericPrice = priceMatch ? parseFloat(priceMatch[0]) : null;
-
       if (index === 0) {
         badgeHTML = `
-          <div class="absolute -top-3 -right-2 bg-pink-500 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
-            🔥 (BEST DEAL)
-          </div>
-        `;
-      } else if (numericPrice && numericPrice < (avgPrice * 0.4)) {
-        badgeHTML = `
-          <div class="absolute -top-3 -right-2 bg-yellow-300 text-slate-900 text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] -rotate-3 z-20">
-            💸 (80% OFF)
+          <div class="absolute -top-3 -right-2 bg-yellow-300 text-slate-900 text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
+            🔥 ULTIMATE STEAL
           </div>
         `;
       } else if (index === 1) {
         badgeHTML = `
-          <div class="absolute -top-3 -right-2 bg-purple-500 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-2 z-20">
-            ✨ (SUPER CHEAP)
+          <div class="absolute -top-3 -right-2 bg-pink-500 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] -rotate-2 z-20">
+            💸 SUPER CHEAP
           </div>
         `;
       }
