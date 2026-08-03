@@ -17,6 +17,15 @@ document.getElementById('searchForm').addEventListener('submit', async function 
     }
 });
 
+// Helper function to force external URLs to start with http:// or https://
+function sanitizeUrl(url) {
+    if (!url) return '#';
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        return `https://${url}`;
+    }
+    return url;
+}
+
 // Calls your Netlify Serverless Backend Function
 async function fetchDupes(query) {
     const endpoint = `/.netlify/functions/search?q=${encodeURIComponent(query)}`;
@@ -40,9 +49,9 @@ async function fetchDupes(query) {
         title: item.title,
         price: item.extracted_price || parseFloat(item.price?.replace(/[^0-9.]/g, '') || 0),
         rawPrice: item.price,
-        source: item.source,
-        image: item.thumbnail,
-        link: item.link
+        source: item.source || 'Store',
+        image: item.thumbnail || 'https://via.placeholder.com/200',
+        link: sanitizeUrl(item.link || item.product_link)
     })).sort((a, b) => a.price - b.price);
 }
 
