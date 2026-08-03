@@ -1,24 +1,17 @@
-export default async function handler(req, res) {
-  const { query } = req.query;
-
-  if (!query) {
-    return res.status(400).json({ error: 'Query is required' });
-  }
-
+// Example backend route update in server.js
+app.get('/api/search', async (req, res) => {
   try {
-    // Calls the Serper shopping search endpoint to find active deals and prices
-    const response = await fetch(`https://google.serper.dev/shopping`, {
-      method: 'POST',
-      headers: {
-        'X-API-KEY': process.env.SERPAPI_KEY,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ q: query })
-    });
+    const query = req.query.query || 'trending deals';
+    
+    // Call your shopping scraper / Google Shopping API wrapper with a high limit to get more items
+    const results = await fetchShoppingResults(query, { num: 40 }); 
 
-    const data = await response.json();
-    return res.status(200).json(data);
+    res.json({
+      success: true,
+      shopping: results || []
+    });
   } catch (error) {
-    return res.status(500).json({ error: 'Failed to fetch deals' });
+    console.error("Search API Error:", error);
+    res.status(500).json({ success: false, shopping: [] });
   }
-}
+});
