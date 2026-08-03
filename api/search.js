@@ -1,36 +1,29 @@
 exports.handler = async (event, context) => {
   try {
     const query = event.queryStringParameters?.query || 'trending deals';
-    console.log(`[Search API] Fetching deals for query: "${query}"`);
-
-    // Safe execution or fallback for shopping data
+    
+    // Perform search/scraping securely
     let results = [];
     if (typeof fetchShoppingResults === 'function') {
-      results = await fetchShoppingResults(query, { num: 40 });
+      results = await fetchShoppingResults(query);
     }
 
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         success: true,
         shopping: Array.isArray(results) ? results : []
       })
     };
   } catch (error) {
-    console.error("[Search API Error]:", error);
-
-    // Forces clean JSON response instead of an HTML crash page
+    console.error("API Error:", error);
+    // Return valid JSON even if it fails, preventing frontend syntax crashes
     return {
-      statusCode: 500,
-      headers: {
-        'Content-Type': 'application/json'
-      },
+      statusCode: 200, // Return 200 with empty array so frontend parses successfully
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         success: false,
-        error: error.message || 'Internal server error',
         shopping: []
       })
     };
