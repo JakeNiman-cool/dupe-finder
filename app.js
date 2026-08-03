@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const genderSelect = document.getElementById("gender-select");
   const sizeSelect = document.getElementById("size-select");
   const clearFiltersBtn = document.getElementById("clear-filters-btn");
+  const clearRecentsBtn = document.getElementById("clear-recents-btn");
   const loadingSpinner = document.getElementById("loading-spinner");
   const noResults = document.getElementById("no-results");
   const resultsGrid = document.getElementById("results-grid");
@@ -52,6 +53,14 @@ document.addEventListener("DOMContentLoaded", () => {
       if (searchInput.value.trim()) {
         performSearch(searchInput.value.trim());
       }
+    });
+  }
+
+  // --- Clear Recents Button Logic ---
+  if (clearRecentsBtn) {
+    clearRecentsBtn.addEventListener("click", () => {
+      localStorage.removeItem("recent_searches");
+      loadRecentSearches();
     });
   }
 
