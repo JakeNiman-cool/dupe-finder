@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFilter = 'all';
   let currentSort = 'low-high';
 
-  // Helper function to execute searches or trending loads
   async function performSearch(queryToSearch) {
     if (!queryToSearch) return;
 
@@ -33,7 +32,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return match ? parseFloat(match[0]) : Infinity;
       }
 
-      // Filter out high-end luxury resale platforms to keep it budget-friendly
+      // Filter out high-end luxury resale platforms
       const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods', '1stdibs'];
       allItems = allItems.filter(item => {
         const sourceName = (item.source || '').toLowerCase();
@@ -56,7 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Handle standard search form submission
   if (searchForm) {
     searchForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -66,7 +64,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Bind any "Trending" buttons or links on your page automatically
   document.querySelectorAll('.trending-trigger, [data-trending]').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -76,7 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Inject Sort dropdown dynamically into the sidebar filter container
   function injectSortDropdown() {
     let sortWrapper = document.getElementById("sort-dropdown-wrapper");
     if (!sortWrapper && filterContainer) {
@@ -119,12 +115,16 @@ document.addEventListener("DOMContentLoaded", () => {
       filtered = filtered.filter(i => textMatch(i, ['authentic', 'real', 'original', 'genuine']));
     }
 
+    // Safety fallback: if a specific filter button leaves 0 results, 
+    // fall back to showing all items instead of breaking the page with "No dupes found"
+    const itemsToRender = filtered.length > 0 ? filtered : allItems;
+
     const getNum = p => {
       const m = (p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
       return m ? parseFloat(m[0]) : Infinity;
     };
 
-    filtered.sort((a, b) => {
+    itemsToRender.sort((a, b) => {
       const priceA = getNum(a.price);
       const priceB = getNum(b.price);
       if (sortVal === 'high-low') {
@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return priceA - priceB;
     });
 
-    renderResults(filtered.length > 0 ? filtered : allItems);
+    renderResults(itemsToRender);
   };
 
   function renderResults(items) {
