@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let allItems = [];
   let currentFilter = 'all';
+  let currentSort = 'low-high'; // default sort
 
   if (searchForm) {
     searchForm.addEventListener("submit", async (e) => {
@@ -24,8 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         let query = rawQuery;
         const lowerQ = rawQuery.toLowerCase();
+        
+        // Handle specific item intents or ensure marketplace terms are included to catch eBay/Vinted results
         if (lowerQ.includes('hand couch') || lowerQ.includes('hand chair')) {
-          query = 'Pedro Friedeberg wooden hand chair sculpture';
+          query = 'Pedro Friedeberg wooden hand chair sculpture ebay vinted';
+        } else if (!lowerQ.includes('ebay') && !lowerQ.includes('vinted')) {
+          query = `${rawQuery} site:ebay.co.uk OR site:vinted.co.uk OR ${rawQuery}`;
         }
 
         const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
@@ -41,40 +46,21 @@ document.addEventListener("DOMContentLoaded", () => {
           return match ? parseFloat(match[0]) : Infinity;
         }
 
-        // Filter out expensive resale/luxury platforms
+        // Filter out expensive luxury resale platforms
         const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods', '1stdibs'];
         allItems = allItems.filter(item => {
           const sourceName = (item.source || '').toLowerCase();
           return !excludedSources.some(exc => sourceName.includes(exc));
         });
 
-        // Advanced sorting: Prioritize cheap marketplace sources (eBay, Vinted) and absolute lowest prices
-        allItems.sort((a, b) => {
-          const priceA = extractPrice(a.price);
-          const priceB = extractPrice(b.price);
-
-          const sourceA = (a.source || '').toLowerCase();
-          const sourceB = (b.source || '').toLowerCase();
-          
-          const isBargainMarketplace = (s) => s.includes('ebay') || s.includes('vinted') || s.includes('depop') || s.includes('mercari');
-          const marketA = isBargainMarketplace(sourceA) ? 1 : 0;
-          const marketB = isBargainMarketplace(sourceB) ? 1 : 0;
-
-          // If prices are relatively close (within 25%), push eBay/Vinted to the top
-          if (Math.abs(priceA - priceB) < (Math.min(priceA, priceB) * 0.25)) {
-            if (marketA !== marketB) {
-              return marketB - marketA;
-            }
-          }
-
-          return priceA - priceB;
-        });
-
         if (allItems.length === 0) {
           if (noResults) noResults.classList.remove("hidden");
         } else {
-          if (filterContainer) filterContainer.classList.remove("hidden");
-          applyFilter(currentFilter);
+          if (filterContainer) {
+            filterContainer.classList.remove("hidden");
+            injectSortDropdown(); // add sort dropdown to the sidebar UI
+          }
+          applyFilter(currentFilter, currentSort);
         }
       } catch (error) {
         console.error("Search failed:", error);
@@ -84,7 +70,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  window.applyFilter = function(type) {
+  // Inject Sort dropdown dynamically into the sidebar filter container
+  function injectSortDropdown() {
+    let sortWrapper = document.getElementById("sort-dropdown-wrapper");
+    if (!sortWrapper && filterContainer) {
+      sortWrapper = document.createElement("div");
+      sortWrapper.id = "sort-dropdown-wrapper";
+      sortWrapper.className = "mt-6 pt-6 border-t-2 border-slate-100";
+      sortWrapper.innerHTML = `
+        <h4 class="text-xl text-slate-900 mb-3">🔄 Sort Order</h4>
+        <select id="sort-select" onchange="window.changeSort(this.value)" class="w-full p-3 bg-white border-2 border-slate-900 rounded-xl font-bold text-slate-900 shadow-[2px_2px_0px_#1e293b] focus:outline-none">
+          <option value="low-high">Price: Low to High 📈</option>
+          <option value="high-low">Price: High to Low 📉</option>
+        </select>
+      `;
+      filterContainer.appendChild(sortWrapper);
+    }
+  }
+
+  window.changeSort = function(sortVal) {
+    currentSort = sortVal;
+    applyFilter(currentFilter, currentSort);
+  };
+
+  window.applyFilter = function(type, sortVal = currentSort) {
     currentFilter = type;
     if (!allItems.length) return;
 
@@ -104,12 +113,19 @@ document.addEventListener("DOMContentLoaded", () => {
       filtered = filtered.filter(i => textMatch(i, ['authentic', 'real', 'original', 'genuine']));
     }
 
+    const getNum = p => {
+      const m = (p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
+      return m ? parseFloat(m[0]) : Infinity;
+    };
+
+    // Apply Low to High or High to Low sorting
     filtered.sort((a, b) => {
-      const getNum = p => {
-        const m = (p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
-        return m ? parseFloat(m[0]) : Infinity;
-      };
-      return getNum(a.price) - getNum(b.price);
+      const priceA = getNum(a.price);
+      const priceB = getNum(b.price);
+      if (sortVal === 'high-low') {
+        return priceB - priceA;
+      }
+      return priceA - priceB;
     });
 
     renderResults(filtered.length > 0 ? filtered : allItems);
@@ -133,13 +149,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const imageUrl = item.imageUrl || item.thumbnail || item.image || item.photo;
 
       let badgeHTML = '';
-      if (index === 0) {
+      if (index === 0 && currentSort === 'low-high') {
         badgeHTML = `
           <div class="absolute -top-3 -right-2 bg-yellow-300 text-slate-900 text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
             🔥 ABSOLUTE LOWEST PRICE
           </div>
         `;
-      } else if (index === 1) {
+      } else if (index === 1 && currentSort === 'low-high') {
         badgeHTML = `
           <div class="absolute -top-3 -right-2 bg-pink-500 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] -rotate-2 z-20">
             💸 CRAZY CHEAP DEAL
