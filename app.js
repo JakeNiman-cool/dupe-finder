@@ -24,8 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         let query = rawQuery;
         const lowerQ = rawQuery.toLowerCase();
-        if (lowerQ.includes('hand couch') || lowerQ.includes('hand chair')) {
-          query = 'Pedro Friedeberg wooden hand chair sculpture';
+        
+        // Quick expansion for hand chair searches to ensure big store hits
+        if (lowerQ.includes('hand couch') || lowerQ === 'hand chair') {
+          query = 'hand chair';
         }
 
         const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
@@ -33,41 +35,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (loadingSpinner) loadingSpinner.classList.add("hidden");
 
+        // Serper Shopping returns array under data.shopping
         allItems = data.shopping || [];
 
         function extractPrice(priceStr) {
           if (!priceStr) return Infinity;
-          const match = priceStr.replace(/[^0-9.]/g, '').match(/[\d.]+/);
+          const match = String(priceStr).replace(/[^0-9.]/g, '').match(/[\d.]+/);
           return match ? parseFloat(match[0]) : Infinity;
         }
 
-        // Filter out luxury resale platforms to stick strictly to cheap alternatives
-        const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods', '1stdibs'];
-        allItems = allItems.filter(item => {
-          const sourceName = (item.source || '').toLowerCase();
-          return !excludedSources.some(exc => sourceName.includes(exc));
-        });
-
-        // Advanced sorting: Prioritize cheap bargain marketplaces (eBay, Vinted, Depop, Mercari) and lowest price
+        // Sort items strictly by price (lowest to highest) across all major stores
         allItems.sort((a, b) => {
-          const priceA = extractPrice(a.price);
-          const priceB = extractPrice(b.price);
-
-          const sourceA = (a.source || '').toLowerCase();
-          const sourceB = (b.source || '').toLowerCase();
-          
-          const isBargainMarketplace = (s) => s.includes('ebay') || s.includes('vinted') || s.includes('depop') || s.includes('mercari') || s.includes('shein') || s.includes('aliexpress') || s.includes('temu');
-          const marketA = isBargainMarketplace(sourceA) ? 1 : 0;
-          const marketB = isBargainMarketplace(sourceB) ? 1 : 0;
-
-          // If prices are relatively close (within 25%), push bargain marketplaces to top
-          if (Math.abs(priceA - priceB) < (Math.min(priceA, priceB) * 0.25)) {
-            if (marketA !== marketB) {
-              return marketB - marketA;
-            }
-          }
-
-          return priceA - priceB;
+          return extractPrice(a.price) - extractPrice(b.price);
         });
 
         if (allItems.length === 0) {
@@ -90,29 +69,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let filtered = [...allItems];
     const textMatch = (item, keywords) => {
-      const text = (item.title + ' ' + (item.source || '')).toLowerCase();
+      const text = ((item.title || '') + ' ' + (item.source || '')).toLowerCase();
       return keywords.some(k => text.includes(k));
     };
 
     if (type === 'new') {
-      filtered = filtered.filter(i => textMatch(i, ['new', 'brand new', 'factory', 'sealed']));
+      filtered = filtered.filter(i => !textMatch(i, ['used', 'pre-owned', 'secondhand', 'refurbished', 'vintage']));
     } else if (type === 'used') {
-      filtered = filtered.filter(i => textMatch(i, ['used', 'pre-owned', 'second hand', 'vintage', 'refurbished', 'ebay', 'vinted', 'depop', 'mercari', 'thrifty']));
+      filtered = filtered.filter(i => textMatch(i, ['used', 'pre-owned', 'secondhand', 'vintage', 'refurbished', 'ebay', 'vinted', 'depop', 'mercari']));
     } else if (type === 'dupe') {
-      filtered = filtered.filter(i => textMatch(i, ['dupe', 'alternative', 'style', 'inspired', 'replica', 'cheap', 'budget', 'shein', 'temu', 'aliexpress', 'dhgate']));
+      // Show bottom 60% lowest price items or items from major budget marketplaces
+      const getNum = p => {
+        const m = String(p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
+        return m ? parseFloat(m[0]) : Infinity;
+      };
+      const prices = allItems.map(i => getNum(i.price)).filter(p => p !== Infinity);
+      const maxPrice = prices.length ? Math.max(...prices) : Infinity;
+      
+      filtered = filtered.filter(i => getNum(i.price) <= maxPrice * 0.6 || textMatch(i, ['amazon', 'target', 'wayfair', 'walmart', 'shein', 'temu', 'ebay']));
     } else if (type === 'real') {
       filtered = filtered.filter(i => textMatch(i, ['authentic', 'real', 'original', 'official', 'genuine']));
     }
 
-    filtered.sort((a, b) => {
-      const getNum = p => {
-        const m = (p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
-        return m ? parseFloat(m[0]) : Infinity;
-      };
-      return getNum(a.price) - getNum(b.price);
-    });
-
-    // If a strict filter returns no results, safely fallback to showing all deals
     renderResults(filtered.length > 0 ? filtered : allItems);
   };
 
@@ -150,7 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const imageSection = imageUrl ? `
         <div class="w-full h-48 bg-amber-50 rounded-2xl overflow-hidden mb-4 flex items-center justify-center p-2 border-2 border-slate-900">
-          <img src="${imageUrl}" alt="${item.title}" class="max-h-full max-w-full object-contain hover:scale-110 transition-transform duration-300" />
+          <img src="${imageUrl}" alt="${item.title || 'Product'}" class="max-h-full max-w-full object-contain hover:scale-110 transition-transform duration-300" />
         </div>
       ` : '';
 
