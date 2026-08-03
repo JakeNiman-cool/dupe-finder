@@ -8,94 +8,58 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let allItems = [];
   let currentFilter = 'all';
-  let currentSort = 'low-high';
-
-  async function performSearch(queryToSearch) {
-    if (!queryToSearch) return;
-
-    if (loadingSpinner) loadingSpinner.classList.remove("hidden");
-    if (noResults) noResults.classList.add("hidden");
-    if (resultsGrid) resultsGrid.innerHTML = "";
-    if (filterContainer) filterContainer.classList.add("hidden");
-
-    try {
-      const response = await fetch(`/api/search?query=${encodeURIComponent(queryToSearch)}`);
-      const data = await response.json();
-
-      if (loadingSpinner) loadingSpinner.classList.add("hidden");
-
-      allItems = data.shopping || [];
-
-      function extractPrice(priceStr) {
-        if (!priceStr) return Infinity;
-        const match = priceStr.replace(/[^0-9.]/g, '').match(/[\d.]+/);
-        return match ? parseFloat(match[0]) : Infinity;
-      }
-
-      // Filter out high-end luxury resale platforms
-      const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods', '1stdibs'];
-      allItems = allItems.filter(item => {
-        const sourceName = (item.source || '').toLowerCase();
-        return !excludedSources.some(exc => sourceName.includes(exc));
-      });
-
-      if (allItems.length === 0) {
-        if (noResults) noResults.classList.remove("hidden");
-      } else {
-        if (filterContainer) {
-          filterContainer.classList.remove("hidden");
-          injectSortDropdown();
-        }
-        applyFilter(currentFilter, currentSort);
-      }
-    } catch (error) {
-      console.error("Search failed:", error);
-      if (loadingSpinner) loadingSpinner.classList.add("hidden");
-      if (noResults) noResults.classList.remove("hidden");
-    }
-  }
 
   if (searchForm) {
     searchForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const rawQuery = searchInput.value.trim();
+      
       if (!rawQuery) return;
-      await performSearch(rawQuery);
+
+      if (loadingSpinner) loadingSpinner.classList.remove("hidden");
+      if (noResults) noResults.classList.add("hidden");
+      if (resultsGrid) resultsGrid.innerHTML = "";
+      if (filterContainer) filterContainer.classList.add("hidden");
+
+      try {
+        const response = await fetch(`/api/search?query=${encodeURIComponent(rawQuery)}`);
+        const data = await response.json();
+
+        if (loadingSpinner) loadingSpinner.classList.add("hidden");
+
+        allItems = data.shopping || [];
+
+        function extractPrice(priceStr) {
+          if (!priceStr) return Infinity;
+          const match = priceStr.replace(/[^0-9.]/g, '').match(/[\d.]+/);
+          return match ? parseFloat(match[0]) : Infinity;
+        }
+
+        // Filter out luxury resale platforms
+        const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods', '1stdibs'];
+        allItems = allItems.filter(item => {
+          const sourceName = (item.source || '').toLowerCase();
+          return !excludedSources.some(exc => sourceName.includes(exc));
+        });
+
+        // Sort lowest price first
+        allItems.sort((a, b) => extractPrice(a.price) - extractPrice(b.price));
+
+        if (allItems.length === 0) {
+          if (noResults) noResults.classList.remove("hidden");
+        } else {
+          if (filterContainer) filterContainer.classList.remove("hidden");
+          applyFilter(currentFilter);
+        }
+      } catch (error) {
+        console.error("Search failed:", error);
+        if (loadingSpinner) loadingSpinner.classList.add("hidden");
+        if (noResults) noResults.classList.remove("hidden");
+      }
     });
   }
 
-  document.querySelectorAll('.trending-trigger, [data-trending]').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      const trendQuery = btn.getAttribute('data-query') || 'trending deals bargains';
-      if (searchInput) searchInput.value = trendQuery;
-      performSearch(trendQuery);
-    });
-  });
-
-  function injectSortDropdown() {
-    let sortWrapper = document.getElementById("sort-dropdown-wrapper");
-    if (!sortWrapper && filterContainer) {
-      sortWrapper = document.createElement("div");
-      sortWrapper.id = "sort-dropdown-wrapper";
-      sortWrapper.className = "mt-6 pt-6 border-t-2 border-slate-100";
-      sortWrapper.innerHTML = `
-        <h4 class="text-xl text-slate-900 mb-3">🔄 Sort Order</h4>
-        <select id="sort-select" onchange="window.changeSort(this.value)" class="w-full p-3 bg-white border-2 border-slate-900 rounded-xl font-bold text-slate-900 shadow-[2px_2px_0px_#1e293b] focus:outline-none">
-          <option value="low-high" ${currentSort === 'low-high' ? 'selected' : ''}>Price: Low to High 📈</option>
-          <option value="high-low" ${currentSort === 'high-low' ? 'selected' : ''}>Price: High to Low 📉</option>
-        </select>
-      `;
-      filterContainer.appendChild(sortWrapper);
-    }
-  }
-
-  window.changeSort = function(sortVal) {
-    currentSort = sortVal;
-    applyFilter(currentFilter, currentSort);
-  };
-
-  window.applyFilter = function(type, sortVal = currentSort) {
+  window.applyFilter = function(type) {
     currentFilter = type;
     if (!allItems.length) return;
 
@@ -108,29 +72,21 @@ document.addEventListener("DOMContentLoaded", () => {
     if (type === 'new') {
       filtered = filtered.filter(i => textMatch(i, ['new', 'brand new', 'factory', 'sealed']));
     } else if (type === 'used') {
-      filtered = filtered.filter(i => textMatch(i, ['used', 'pre-owned', 'second hand', 'vintage', 'refurbished', 'ebay', 'vinted', '70s', '1970']));
+      filtered = filtered.filter(i => textMatch(i, ['used', 'pre-owned', 'second hand', 'vintage', 'refurbished']));
     } else if (type === 'dupe') {
       filtered = filtered.filter(i => textMatch(i, ['dupe', 'alternative', 'style', 'inspired', 'replica']));
     } else if (type === 'real') {
       filtered = filtered.filter(i => textMatch(i, ['authentic', 'real', 'original', 'genuine']));
     }
 
-    // Safety fallback: if a specific filter button leaves 0 results, 
-    // fall back to showing all items instead of breaking the page with "No dupes found"
     const itemsToRender = filtered.length > 0 ? filtered : allItems;
 
-    const getNum = p => {
-      const m = (p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
-      return m ? parseFloat(m[0]) : Infinity;
-    };
-
     itemsToRender.sort((a, b) => {
-      const priceA = getNum(a.price);
-      const priceB = getNum(b.price);
-      if (sortVal === 'high-low') {
-        return priceB - priceA;
-      }
-      return priceA - priceB;
+      const getNum = p => {
+        const m = (p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
+        return m ? parseFloat(m[0]) : Infinity;
+      };
+      return getNum(a.price) - getNum(b.price);
     });
 
     renderResults(itemsToRender);
@@ -154,18 +110,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const imageUrl = item.imageUrl || item.thumbnail || item.image || item.photo;
 
       let badgeHTML = '';
-      if (index === 0 && currentSort === 'low-high') {
-        badgeHTML = `
-          <div class="absolute -top-3 -right-2 bg-yellow-300 text-slate-900 text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
-            🔥 ABSOLUTE LOWEST PRICE
-          </div>
-        `;
-      } else if (index === 1 && currentSort === 'low-high') {
-        badgeHTML = `
-          <div class="absolute -top-3 -right-2 bg-pink-500 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] -rotate-2 z-20">
-            💸 CRAZY CHEAP DEAL
-          </div>
-        `;
+      if (index === 0) {
+        badgeHTML = `<div class="absolute -top-3 -right-2 bg-yellow-300 text-slate-900 text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-25">🔥 ABSOLUTE LOWEST PRICE</div>`;
+      } else if (index === 1) {
+        badgeHTML = `<div class="absolute -top-3 -right-2 bg-pink-500 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] -rotate-2 z-25">💸 CRAZY CHEAP DEAL</div>`;
       }
 
       const imageSection = imageUrl ? `
