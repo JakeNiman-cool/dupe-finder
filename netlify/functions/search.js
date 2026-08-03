@@ -1,5 +1,3 @@
-const axios = require('axios');
-
 exports.handler = async function (event, context) {
   const query = event.queryStringParameters.q;
 
@@ -13,21 +11,19 @@ exports.handler = async function (event, context) {
   try {
     const apiKey = process.env.SERPAPI_KEY;
 
-    // We pass strict parameters to Google Shopping to guarantee accuracy
-    const response = await axios.get('https://serpapi.com/search.json', {
-      params: {
-        engine: 'google_shopping',
-        q: query,
-        api_key: apiKey,
-        gl: 'us',           // Target location (e.g. 'us' or 'uk')
-        hl: 'en',           // Language
-        direct_link: true,  // Bypasses redirect links straight to real product pages
-      },
-    });
+    // Use native fetch to hit SerpApi with Google Shopping parameters
+    const response = await fetch(
+      `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(query)}&api_key=${apiKey}&gl=us&hl=en&direct_link=true`
+    );
 
-    const shoppingResults = response.data.shopping_results || [];
+    if (!response.ok) {
+      throw new Error(`SerpApi responded with status: ${response.status}`);
+    }
 
-    // Filter out irrelevant items that lack a title or valid price
+    const data = await response.json();
+    const shoppingResults = data.shopping_results || [];
+
+    // Filter out irrelevant items lacking titles or prices
     const cleanedResults = shoppingResults
       .filter(item => item.title && item.price)
       .map(item => ({
