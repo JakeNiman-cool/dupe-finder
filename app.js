@@ -20,8 +20,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const text = e.currentTarget.textContent.toLowerCase();
         const filterType = e.currentTarget.dataset.filter || text;
 
-        if (filterType.includes('high') || filterType.includes('luxury') || filterType.includes('splurge')) {
-          applyFilter('high');
+        if (filterType.includes('low to high') || filterType.includes('cheapest')) {
+          applyFilter('low-to-high');
+        } else if (filterType.includes('high to low') || filterType.includes('splurge') || filterType.includes('expensive')) {
+          applyFilter('high-to-low');
         } else if (filterType.includes('new')) {
           applyFilter('new');
         } else if (filterType.includes('used') || filterType.includes('pre-owned') || filterType.includes('secondhand')) {
@@ -70,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
           return match ? parseFloat(match[0]) : Infinity;
         }
 
-        // Sort default view by lowest price
+        // Default sort: Lowest Price to Highest Price
         allItems.sort((a, b) => extractPrice(a.price) - extractPrice(b.price));
 
         if (allItems.length === 0) {
@@ -108,15 +110,13 @@ document.addEventListener("DOMContentLoaded", () => {
       return keywords.some(k => text.includes(k));
     };
 
-    if (type === 'high') {
-      // Sort highest price first + filter top 40% price bracket or luxury keywords
-      const validPrices = allItems.map(i => getNum(i.price)).filter(p => p > 0);
-      const avgPrice = validPrices.reduce((a,b) => a+b, 0) / (validPrices.length || 1);
-      
-      filtered = filtered.filter(i => getNum(i.price) >= avgPrice || textMatch(i, ['luxury', 'designer', 'authentic', 'original', '1stDibs', 'farfetch', 'saks']));
+    if (type === 'low-to-high') {
+      // Sort strictly by lowest price first
+      filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
+    } else if (type === 'high-to-low') {
+      // Sort strictly by highest price first
       filtered.sort((a, b) => getNum(b.price) - getNum(a.price));
     } else if (type === 'dupe' || type === 'cheap') {
-      // Lowest 50% price bracket
       const validPrices = allItems.map(i => getNum(i.price)).filter(p => p > 0);
       const medianPrice = validPrices.length ? validPrices[Math.floor(validPrices.length / 2)] : Infinity;
 
@@ -153,11 +153,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const imageUrl = item.imageUrl || item.thumbnail || item.image || item.photo;
 
       let badgeHTML = '';
-      if (activeType === 'high') {
+      if (activeType === 'high-to-low') {
         if (index === 0) {
           badgeHTML = `
             <div class="absolute -top-3 -right-2 bg-purple-600 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
-              👑 ULTIMATE SPLURGE
+              👑 HIGHEST PRICE
             </div>
           `;
         }
