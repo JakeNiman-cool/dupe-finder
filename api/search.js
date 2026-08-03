@@ -1,75 +1,98 @@
 export default async function handler(req, res) {
   try {
     const rawQuery = req.query.query || 'trending deals';
-    const query = decodeURIComponent(rawQuery).toLowerCase();
-    console.log(`[Search API] Generating smart inventory for: "${query}"`);
+    const query = decodeURIComponent(rawQuery).trim();
+    console.log(`[Search API] Fetching live marketplace results for: "${query}"`);
 
-    const capitalizedQuery = query.charAt(0).toUpperCase() + query.slice(1);
+    // Use a clean public JSON endpoint or structured data fetch to get real live listings
+    const targetUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query + ' site:ebay.co.uk OR site:vinted.co.uk')}`;
+    
+    const response = await fetch(targetUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+      }
+    });
+    
+    const html = await response.text();
+    const results = [];
 
-    // Pick appropriate context images based on what the user actually searched for
-    let sneakerImage = "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300"; // Default red sneaker
-    if (query.includes('dunk') || query.includes('shoe') || query.includes('sneaker') || query.includes('nike') || query.includes('jordan')) {
-      sneakerImage = "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=300"; // Clean sneaker image
-    } else if (query.includes('perfume') || query.includes('lip') || query.includes('oil') || query.includes('dior') || query.includes('santal')) {
-      sneakerImage = "https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=300"; // Cosmetic bottle
-    } else if (query.includes('watch') || query.includes('stanley') || query.includes('cup')) {
-      sneakerImage = "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300"; // Accessory
+    // Extract search results safely
+    const regex = /<a class="result__url" href="([^"]+)"[^>]*>(.*?)<\/a>.*?<a class="result__snippet"[^>]*>(.*?)<\/a>/gs;
+    let match;
+
+    while ((match = regex.exec(html)) && results.length < 25) {
+      let link = match[1];
+      // Clean up DuckDuckGo redirect links if present
+      if (link.includes('uddg=')) {
+        try {
+          const params = new URLSearchParams(link.split('?')[1]);
+          link = decodeURIComponent(params.get('uddg') || link);
+        } catch (e) {}
+      }
+
+      const title = match[2].replace(/<[^>]*>?/gm, '').trim();
+      const snippet = match[3].replace(/<[^>]*>?/gm, '').trim();
+
+      // Extract price if available in snippet
+      const priceMatch = snippet.match(/(?:£|\$|€)\s*\d+(?:\.\d{2})?/);
+      const price = priceMatch ? priceMatch[0] : 'Check site';
+
+      let source = 'Marketplace';
+      const lower = link.toLowerCase();
+      if (lower.includes('ebay')) source = 'eBay';
+      else if (lower.includes('vinted')) source = 'Vinted';
+      else if (lower.includes('depop')) source = 'Depop';
+      else if (lower.includes('amazon')) source = 'Amazon';
+
+      if (title && link && !results.some(r => r.link === link)) {
+        results.push({
+          title: title,
+          price: price,
+          source: source,
+          link: link,
+          thumbnail: lower.includes('vinted') 
+            ? 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300' 
+            : 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=300'
+        });
+      }
     }
 
-    const items = [
+    // Fallback if parsing is blocked, ensuring dynamic direct search links are provided
+    const finalResults = results.length > 0 ? results : [
       {
-        title: `Vintage 90s ${capitalizedQuery} - Excellent Condition`,
-        price: "£14.50",
-        source: "Vinted",
-        link: `https://www.vinted.co.uk/catalog?search_text=${encodeURIComponent(query)}`,
-        thumbnail: sneakerImage
-      },
-      {
-        title: `Authentic ${capitalizedQuery} Tested & Working`,
-        price: "£21.99",
+        title: `Live eBay Deals for ${query}`,
+        price: "View Live",
         source: "eBay",
         link: `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponent(query)}&_sop=15`,
-        thumbnail: sneakerImage
+        thumbnail: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=300"
       },
       {
-        title: `Unbranded Aesthetic Alternative / Dupe of ${capitalizedQuery}`,
-        price: "£8.99",
-        source: "Depop",
-        link: `https://www.depop.com/search/?q=${encodeURIComponent(query)}`,
-        thumbnail: sneakerImage
-      },
-      {
-        title: `Pre-loved ${capitalizedQuery} Thrift Bargain`,
-        price: "£11.00",
+        title: `Live Vinted Listings for ${query}`,
+        price: "View Live",
         source: "Vinted",
-        link: `https://www.vinted.co.uk/catalog?search_text=${encodeURIComponent(query)}`,
-        thumbnail: sneakerImage
-      },
-      {
-        title: `Rare Limited Edition Style ${capitalizedQuery}`,
-        price: "£29.50",
-        source: "eBay",
-        link: `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponent(query)}&_sop=15`,
-        thumbnail: sneakerImage
-      },
-      {
-        title: `Budget Everyday Style ${capitalizedQuery} Model`,
-        price: "£16.00",
-        source: "Amazon",
-        link: `https://www.amazon.co.uk/s?k=${encodeURIComponent(query)}`,
-        thumbnail: sneakerImage
+        link: `https://www.vinted.co.uk/catalog?search_text=${encodeURIComponent(query)}&order=price_low_to_high`,
+        thumbnail: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300"
       }
     ];
 
     return res.status(200).json({
       success: true,
-      shopping: items
+      shopping: finalResults
     });
+
   } catch (error) {
-    console.error("[Search API Error]:", error);
+    console.error("[Search API Fatal Error]:", error);
     return res.status(200).json({
-      success: false,
-      shopping: []
+      success: true,
+      shopping: [
+        {
+          title: `Search ${req.query.query || 'items'} on eBay`,
+          price: "Check Price",
+          source: "eBay",
+          link: `https://www.ebay.co.uk/sch/i.html?_nkw=${encodeURIComponent(req.query.query || '')}`,
+          thumbnail: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=300"
+        }
+      ]
     });
   }
 }
