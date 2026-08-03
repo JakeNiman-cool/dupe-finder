@@ -15,6 +15,14 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFilter = 'all';
   let activeCategory = '';
 
+  // Helper function to clean search query (strips filler words)
+  function cleanSearchQuery(query) {
+    const fillerWords = ["a", "an", "the", "for", "with", "in", "of", "and", "looking", "find", "cheap", "best", "dupe"];
+    const words = query.toLowerCase().trim().split(/\s+/);
+    const cleaned = words.filter(word => !fillerWords.includes(word));
+    return cleaned.length > 0 ? cleaned.join(" ") : query;
+  }
+
   // --- Size Hover Option Selection ---
   document.querySelectorAll(".size-opt").forEach(btn => {
     btn.addEventListener("click", (e) => {
@@ -140,7 +148,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Perform Search ---
+  // --- Perform Flexible Search ---
   async function performSearch(rawQuery) {
     if (!rawQuery) return;
 
@@ -153,23 +161,40 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const gender = genderSelect ? genderSelect.value : '';
       const size = sizeSelect ? sizeSelect.value : '';
+      const cleanedQuery = cleanSearchQuery(rawQuery);
 
-      const url = `/api/search?query=${encodeURIComponent(rawQuery)}&category=${encodeURIComponent(activeCategory)}&gender=${encodeURIComponent(gender)}&size=${encodeURIComponent(size)}`;
+      const url = `/api/search?query=${encodeURIComponent(cleanedQuery)}&category=${encodeURIComponent(activeCategory)}&gender=${encodeURIComponent(gender)}&size=${encodeURIComponent(size)}`;
       
       const response = await fetch(url);
       const data = await response.json();
 
       if (loadingSpinner) loadingSpinner.classList.add("hidden");
 
-      allItems = data.shopping || [];
+      let results = data.shopping || [];
+
+      // Flexible Client-Side Filtering:
+      // Check if title contains ALL or MOST search query keywords
+      const queryWords = cleanedQuery.toLowerCase().split(/\s+/);
+      
+      if (results.length > 0 && queryWords.length > 1) {
+        results.sort((a, b) => {
+          const titleA = (a.title || '').toLowerCase();
+          const titleB = (b.title || '').toLowerCase();
+
+          const scoreA = queryWords.reduce((acc, word) => acc + (titleA.includes(word) ? 1 : 0), 0);
+          const scoreB = queryWords.reduce((acc, word) => acc + (titleB.includes(word) ? 1 : 0), 0);
+
+          return scoreB - scoreA; // Higher keyword matches come first
+        });
+      }
+
+      allItems = results;
 
       function extractPrice(priceStr) {
         if (!priceStr) return Infinity;
         const match = String(priceStr).replace(/[^0-9.]/g, '').match(/[\d.]+/);
         return match ? parseFloat(match[0]) : Infinity;
       }
-
-      allItems.sort((a, b) => extractPrice(a.price) - extractPrice(b.price));
 
       if (allItems.length === 0) {
         if (noResults) noResults.classList.remove("hidden");
