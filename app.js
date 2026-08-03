@@ -22,7 +22,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (loadingSpinner) loadingSpinner.classList.add("hidden");
 
-        const items = data.shopping || [];
+        let items = data.shopping || [];
+
+        // SMART SORTING: Prioritize items that have both a price and an image so the best options pop up first!
+        items.sort((a, b) => {
+          const hasImageA = (a.imageUrl || a.thumbnail || a.image || a.photo) ? 1 : 0;
+          const hasImageB = (b.imageUrl || b.thumbnail || b.image || b.photo) ? 1 : 0;
+          const hasPriceA = a.price ? 1 : 0;
+          const hasPriceB = b.price ? 1 : 0;
+
+          // Score items based on completeness
+          const scoreA = hasImageA + hasPriceA;
+          const scoreB = hasImageB + hasPriceB;
+
+          return scoreB - scoreA; // Higher score comes first
+        });
 
         if (items.length === 0) {
           if (noResults) noResults.classList.remove("hidden");
@@ -59,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <h3 class="font-bold text-slate-900 hover:text-pink-600 transition-colors mb-2 line-clamp-2 text-base">
             <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
           </h3>
-          <p class="text-pink-600 font-black text-xl mb-3">${item.price || ""}</p>
+          <p class="text-pink-600 font-black text-xl mb-3">${item.price || "Check site for price"}</p>
         </div>
         <div class="pt-4 border-t-2 border-slate-100 flex items-center justify-between text-xs">
           <span class="bg-purple-100 text-purple-700 px-2.5 py-1 rounded-lg font-bold border border-slate-900 truncate max-w-[120px]">${item.source || "Store"}</span>
