@@ -26,33 +26,26 @@ export default async function handler(req, res) {
     if (category) fullQuery += ` ${category}`;
     if (size) fullQuery += ` size ${size}`;
 
-    // Parallel calls to grab general shopping + direct eBay listings
-    const [standardRes, ebayRes, directEbayRes] = await Promise.all([
+    // Safely fetch standard results AND specific Temu results side-by-side
+    const [standardRes, temuRes] = await Promise.all([
       fetch(`https://google.serper.dev/shopping`, {
         method: 'POST',
         headers: serperHeaders,
-        body: JSON.stringify({ q: fullQuery, num: 100 })
+        body: JSON.stringify({ q: fullQuery, num: 60 })
       }),
       fetch(`https://google.serper.dev/shopping`, {
         method: 'POST',
         headers: serperHeaders,
-        body: JSON.stringify({ q: `site:ebay.com ${fullQuery}`, num: 100 })
-      }),
-      // Raw string search to catch exact individual eBay listings
-      fetch(`https://google.serper.dev/shopping`, {
-        method: 'POST',
-        headers: serperHeaders,
-        body: JSON.stringify({ q: `ebay ${query}`, num: 100 })
+        body: JSON.stringify({ q: `site:temu.com ${fullQuery}`, num: 40 })
       })
     ]);
 
     const standardData = await standardRes.json();
-    const ebayData = await ebayRes.json();
-    const directEbayData = await directEbayRes.json();
+    const temuData = await temuRes.json();
 
+    // Combine them safely (Temu items first so they show up prominently)
     const combined = [
-      ...(ebayData.shopping || []),
-      ...(directEbayData.shopping || []),
+      ...(temuData.shopping || []),
       ...(standardData.shopping || [])
     ];
 
