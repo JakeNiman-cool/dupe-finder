@@ -173,7 +173,6 @@ document.addEventListener("DOMContentLoaded", () => {
       let results = data.shopping || [];
 
       // Flexible Client-Side Filtering:
-      // Check if title contains ALL or MOST search query keywords
       const queryWords = cleanedQuery.toLowerCase().split(/\s+/);
       
       if (results.length > 0 && queryWords.length > 1) {
@@ -184,17 +183,11 @@ document.addEventListener("DOMContentLoaded", () => {
           const scoreA = queryWords.reduce((acc, word) => acc + (titleA.includes(word) ? 1 : 0), 0);
           const scoreB = queryWords.reduce((acc, word) => acc + (titleB.includes(word) ? 1 : 0), 0);
 
-          return scoreB - scoreA; // Higher keyword matches come first
+          return scoreB - scoreA;
         });
       }
 
       allItems = results;
-
-      function extractPrice(priceStr) {
-        if (!priceStr) return Infinity;
-        const match = String(priceStr).replace(/[^0-9.]/g, '').match(/[\d.]+/);
-        return match ? parseFloat(match[0]) : Infinity;
-      }
 
       if (allItems.length === 0) {
         if (noResults) noResults.classList.remove("hidden");
@@ -320,6 +313,13 @@ document.addEventListener("DOMContentLoaded", () => {
         </div>
       ` : '';
 
+      // Check if source is Temu for custom badge styling
+      const sourceName = (item.source || "Store").toLowerCase();
+      const isTemu = sourceName.includes('temu');
+      const badgeStyle = isTemu 
+        ? "bg-orange-400 text-slate-900" 
+        : "bg-purple-100 text-purple-700";
+
       card.innerHTML = `
         <div>
           ${badgeHTML}
@@ -330,7 +330,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <p class="text-pink-600 text-2xl font-black mb-3">${item.price || "Check site"}</p>
         </div>
         <div class="pt-4 border-t-2 border-slate-100 flex items-center justify-between text-sm">
-          <span class="bg-purple-100 text-purple-700 px-3 py-1 rounded-xl border-2 border-slate-900 font-bold truncate max-w-[110px]">${item.source || "Store"}</span>
+          <span class="${badgeStyle} px-3 py-1 rounded-xl border-2 border-slate-900 font-bold truncate max-w-[110px]">${isTemu ? '🍊 Temu' : (item.source || "Store")}</span>
           <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="cartoony-button px-3 py-1.5 bg-yellow-300 text-slate-900 font-bold text-xs rounded-xl hover:bg-yellow-400 border-2 border-slate-900">
             Grab Deal 🛒
           </a>
