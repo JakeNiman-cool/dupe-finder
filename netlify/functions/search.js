@@ -1,34 +1,56 @@
+const axios = require('axios');
+
 exports.handler = async function (event, context) {
-    // Extract query parameter from request URL
-    const query = event.queryStringParameters.q;
-    
-    if (!query) {
-        return {
-            statusCode: 400,
-            body: JSON.stringify({ error: "Missing search query parameter 'q'" })
-        };
-    }
+  const query = event.queryStringParameters.q;
 
-    // SerpApi configuration
-    const SERPAPI_KEY = "40840038eecafc31d5871a20df7f2c3eef586d4bacfde913665d9fd36aee7804";
-    const targetUrl = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(query + " dupe alternative")}&api_key=${SERPAPI_KEY}`;
+  if (!query) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'Query parameter "q" is required' }),
+    };
+  }
 
-    try {
-        const response = await fetch(targetUrl);
-        const data = await response.json();
+  try {
+    const apiKey = process.env.SERPAPI_KEY;
 
-        return {
-            statusCode: 200,
-            headers: {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "*" // Enables direct frontend access
-            },
-            body: JSON.stringify(data)
-        };
-    } catch (error) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ error: "Serverless function failed to reach SerpApi" })
-        };
-    }
+    // We pass strict parameters to Google Shopping to guarantee accuracy
+    const response = await axios.get('https://serpapi.com/search.json', {
+      params: {
+        engine: 'google_shopping',
+        q: query,
+        api_key: apiKey,
+        gl: 'us',           // Target location (e.g. 'us' or 'uk')
+        hl: 'en',           // Language
+        direct_link: true,  // Bypasses redirect links straight to real product pages
+      },
+    });
+
+    const shoppingResults = response.data.shopping_results || [];
+
+    // Filter out irrelevant items that lack a title or valid price
+    const cleanedResults = shoppingResults
+      .filter(item => item.title && item.price)
+      .map(item => ({
+        title: item.title,
+        price: item.extracted_price || item.price,
+        formattedPrice: item.price,
+        link: item.link,
+        image: item.thumbnail,
+        source: item.source || 'Store',
+      }));
+
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ results: cleanedResults }),
+    };
+  } catch (error) {
+    console.error('SerpApi Error:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Failed to fetch search results' }),
+    };
+  }
 };
