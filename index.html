@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DupeSpotter 🛒 | Find Deals & Cheap Dupes</title>
   
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   
   <style>
@@ -55,13 +54,13 @@
   </header>
 
   <main class="max-w-7xl mx-auto px-4">
-    <!-- Search Bar Container -->
-    <div class="max-w-3xl mx-auto mb-10">
+    <!-- Search Bar & Fine-Tune Inputs -->
+    <div class="max-w-3xl mx-auto mb-10 space-y-4">
       <form id="search-form" class="flex flex-col sm:flex-row gap-3">
         <input 
           type="text" 
           id="search-input"
-          placeholder="Search for hand chair, bleu de chanel, nike sneakers..." 
+          placeholder="Search for shoes, jacket, sofa, airpods..." 
           class="cartoony-input flex-1 px-5 py-4 rounded-2xl text-lg font-bold bg-white focus:outline-none focus:ring-4 focus:ring-yellow-300"
           required
         />
@@ -73,8 +72,47 @@
         </button>
       </form>
 
-      <!-- Old Searches Pill Container -->
-      <div id="recent-searches" class="mt-3 flex flex-wrap items-center gap-2 text-sm font-bold">
+      <!-- Category Shortcuts -->
+      <div id="category-pills" class="flex flex-wrap gap-2 justify-center">
+        <button data-category="clothing" class="cartoony-button bg-yellow-200 hover:bg-yellow-300 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
+          👕 Clothing
+        </button>
+        <button data-category="shoes" class="cartoony-button bg-pink-200 hover:bg-pink-300 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
+          👟 Shoes
+        </button>
+        <button data-category="furniture" class="cartoony-button bg-purple-200 hover:bg-purple-300 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
+          🛋️ Furniture
+        </button>
+        <button data-category="tech" class="cartoony-button bg-blue-200 hover:bg-blue-300 text-slate-900 font-bold px-3 py-1.5 rounded-xl text-sm">
+          🎧 Tech / Electronics
+        </button>
+      </div>
+
+      <!-- Gender & Size Selectors -->
+      <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+        <div class="flex items-center gap-1 font-bold text-sm">
+          <label for="gender-select">Gender:</label>
+          <select id="gender-select" class="cartoony-input bg-white px-3 py-1.5 rounded-xl text-sm font-bold">
+            <option value="">Any</option>
+            <option value="men">Men's / Male</option>
+            <option value="women">Women's / Female</option>
+            <option value="unisex">Unisex</option>
+          </select>
+        </div>
+
+        <div class="flex items-center gap-1 font-bold text-sm">
+          <label for="size-input">Size:</label>
+          <input 
+            type="text" 
+            id="size-input" 
+            placeholder="e.g. 10, M, L" 
+            class="cartoony-input bg-white px-3 py-1.5 rounded-xl text-sm font-bold w-28" 
+          />
+        </div>
+      </div>
+
+      <!-- Recent Searches -->
+      <div id="recent-searches" class="mt-2 flex flex-wrap items-center justify-center gap-2 text-sm font-bold">
         <span class="text-slate-500 text-xs font-black uppercase">Recent:</span>
         <div id="recent-tags" class="flex flex-wrap gap-2"></div>
       </div>
@@ -134,20 +172,17 @@
 
       <!-- Right Column: Results Grid -->
       <section class="md:col-span-3">
-        <!-- Loading Spinner -->
         <div id="loading-spinner" class="hidden text-center py-16">
           <div class="inline-block animate-spin text-5xl mb-3">🌀</div>
-          <p class="text-xl font-black text-slate-700">Hunting down prices across all store options...</p>
+          <p class="text-xl font-black text-slate-700">Hunting down cheap $5 eBay deals & major store listings...</p>
         </div>
 
-        <!-- No Results State -->
         <div id="no-results" class="hidden text-center py-16 bg-white rounded-3xl cartoony-card max-w-md mx-auto">
           <div class="text-5xl mb-3">🛋️</div>
           <h3 class="text-2xl font-black mb-2">No Deals Found</h3>
           <p class="text-slate-600 font-bold px-4">Try searching with simpler terms!</p>
         </div>
 
-        <!-- Product Cards Container -->
         <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </section>
 
