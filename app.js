@@ -12,7 +12,6 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (!query) return;
 
-      // 1. Show loading spinner, clear old results & error message
       if (loadingSpinner) loadingSpinner.classList.remove("hidden");
       if (noResults) noResults.classList.add("hidden");
       if (resultsGrid) resultsGrid.innerHTML = "";
@@ -21,37 +20,32 @@ document.addEventListener("DOMContentLoaded", () => {
         const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
         const data = await response.json();
 
-        // Hide loading spinner
+        // 🔍 DEBUG: Print the raw API response to your browser console
+        console.log("RAW API RESPONSE:", data);
+
         if (loadingSpinner) loadingSpinner.classList.add("hidden");
 
-        // Grab organic search results from backend
         const items = data.organic || [];
 
         if (items.length === 0) {
-          // Show "No dupes found" box
           if (noResults) noResults.classList.remove("hidden");
         } else {
-          // Render results into your grid
           renderResults(items);
         }
       } catch (error) {
         console.error("Search failed:", error);
         if (loadingSpinner) loadingSpinner.classList.add("hidden");
-        if (noResults) {
-          noResults.classList.remove("hidden");
-        }
+        if (noResults) noResults.classList.remove("hidden");
       }
     });
   }
 
   function renderResults(items) {
     if (!resultsGrid) return;
-    
     resultsGrid.innerHTML = "";
 
     items.forEach((item) => {
       const card = document.createElement("div");
-      // Tailwind styling to match your dark slate theme perfectly
       card.className = "bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between hover:border-purple-500/50 transition-all shadow-lg group";
       
       card.innerHTML = `
