@@ -9,6 +9,29 @@ document.addEventListener("DOMContentLoaded", () => {
   let allItems = [];
   let currentFilter = 'all';
 
+  // --- Attach Click Listeners to Filter Buttons ---
+  if (filterContainer) {
+    const filterButtons = filterContainer.querySelectorAll("button");
+    filterButtons.forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        // Highlight active button visually
+        filterButtons.forEach(b => b.classList.remove("ring-4", "ring-slate-900", "scale-105"));
+        e.currentTarget.classList.add("ring-4", "ring-slate-900", "scale-105");
+
+        // Determine filter type from data attribute, id, or text
+        const filterType = e.currentTarget.dataset.filter || 
+                           e.currentTarget.id.replace('filter-', '') || 
+                           e.currentTarget.textContent.toLowerCase();
+
+        if (filterType.includes('new')) applyFilter('new');
+        else if (filterType.includes('used') || filterType.includes('pre-owned') || filterType.includes('secondhand')) applyFilter('used');
+        else if (filterType.includes('dupe') || filterType.includes('alternative') || filterType.includes('cheap')) applyFilter('dupe');
+        else if (filterType.includes('real') || filterType.includes('authentic')) applyFilter('real');
+        else applyFilter('all');
+      });
+    });
+  }
+
   if (searchForm) {
     searchForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -25,7 +48,6 @@ document.addEventListener("DOMContentLoaded", () => {
         let query = rawQuery;
         const lowerQ = rawQuery.toLowerCase();
         
-        // Quick expansion for hand chair searches to ensure big store hits
         if (lowerQ.includes('hand couch') || lowerQ === 'hand chair') {
           query = 'hand chair';
         }
@@ -35,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (loadingSpinner) loadingSpinner.classList.add("hidden");
 
-        // Serper Shopping returns array under data.shopping
+        // Google Serper items
         allItems = data.shopping || [];
 
         function extractPrice(priceStr) {
@@ -44,10 +66,8 @@ document.addEventListener("DOMContentLoaded", () => {
           return match ? parseFloat(match[0]) : Infinity;
         }
 
-        // Sort items strictly by price (lowest to highest) across all major stores
-        allItems.sort((a, b) => {
-          return extractPrice(a.price) - extractPrice(b.price);
-        });
+        // Sort items strictly by lowest price (second-hand & new mixed in price order)
+        allItems.sort((a, b) => extractPrice(a.price) - extractPrice(b.price));
 
         if (allItems.length === 0) {
           if (noResults) noResults.classList.remove("hidden");
@@ -63,22 +83,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  window.applyFilter = function(type) {
+  function applyFilter(type) {
     currentFilter = type;
     if (!allItems.length) return;
 
     let filtered = [...allItems];
+
+    const isSecondHandStore = (sourceStr) => {
+      const src = (sourceStr || '').toLowerCase();
+      return ['ebay', 'poshmark', 'depop', 'vinted', 'mercari', 'thredup', 'grailed', 'thrift', 'goodwill', 'realreal'].some(marketplace => src.includes(marketplace));
+    };
+
     const textMatch = (item, keywords) => {
       const text = ((item.title || '') + ' ' + (item.source || '')).toLowerCase();
       return keywords.some(k => text.includes(k));
     };
 
     if (type === 'new') {
-      filtered = filtered.filter(i => !textMatch(i, ['used', 'pre-owned', 'secondhand', 'refurbished', 'vintage']));
+      // Exclude secondhand platforms and titles indicating used condition
+      filtered = filtered.filter(i => !isSecondHandStore(i.source) && !textMatch(i, ['used', 'pre-owned', 'secondhand', 'refurbished', 'vintage']));
     } else if (type === 'used') {
-      filtered = filtered.filter(i => textMatch(i, ['used', 'pre-owned', 'secondhand', 'vintage', 'refurbished', 'ebay', 'vinted', 'depop', 'mercari']));
+      // Include any items coming from reseller marketplaces OR with used keywords in the title
+      filtered = filtered.filter(i => isSecondHandStore(i.source) || textMatch(i, ['used', 'pre-owned', 'secondhand', 'vintage', 'refurbished']));
     } else if (type === 'dupe') {
-      // Show bottom 60% lowest price items or items from major budget marketplaces
+      // Show lower-priced items & budget marketplaces
       const getNum = p => {
         const m = String(p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
         return m ? parseFloat(m[0]) : Infinity;
@@ -86,13 +114,13 @@ document.addEventListener("DOMContentLoaded", () => {
       const prices = allItems.map(i => getNum(i.price)).filter(p => p !== Infinity);
       const maxPrice = prices.length ? Math.max(...prices) : Infinity;
       
-      filtered = filtered.filter(i => getNum(i.price) <= maxPrice * 0.6 || textMatch(i, ['amazon', 'target', 'wayfair', 'walmart', 'shein', 'temu', 'ebay']));
+      filtered = filtered.filter(i => getNum(i.price) <= maxPrice * 0.7 || textMatch(i, ['amazon', 'target', 'wayfair', 'walmart', 'shein', 'temu', 'ebay']));
     } else if (type === 'real') {
       filtered = filtered.filter(i => textMatch(i, ['authentic', 'real', 'original', 'official', 'genuine']));
     }
 
     renderResults(filtered.length > 0 ? filtered : allItems);
-  };
+  }
 
   function renderResults(items) {
     if (!resultsGrid) return;
@@ -136,14 +164,14 @@ document.addEventListener("DOMContentLoaded", () => {
         <div>
           ${badgeHTML}
           ${imageSection}
-          <h3 class="text-slate-900 hover:text-pink-600 transition-colors mb-2 line-clamp-2 text-lg">
+          <h3 class="text-slate-900 hover:text-pink-600 transition-colors mb-2 line-clamp-2 text-lg font-bold">
             <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
           </h3>
-          <p class="text-pink-600 text-2xl mb-3">${item.price || "Check site for price"}</p>
+          <p class="text-pink-600 text-2xl font-black mb-3">${item.price || "Check site for price"}</p>
         </div>
         <div class="pt-4 border-t-2 border-slate-100 flex items-center justify-between text-sm">
-          <span class="bg-purple-100 text-purple-700 px-3 py-1.5 rounded-xl border-2 border-slate-900 truncate max-w-[120px]">${item.source || "Store"}</span>
-          <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="cartoony-button px-4 py-2 bg-yellow-300 text-slate-900 rounded-xl hover:bg-yellow-400">
+          <span class="bg-purple-100 text-purple-700 px-3 py-1.5 rounded-xl border-2 border-slate-900 font-bold truncate max-w-[120px]">${item.source || "Store"}</span>
+          <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="cartoony-button px-4 py-2 bg-yellow-300 text-slate-900 font-bold rounded-xl hover:bg-yellow-400 border-2 border-slate-900">
             Grab Deal 🛒
           </a>
         </div>
