@@ -116,7 +116,7 @@
           <input 
             id="search-input"
             type="text" 
-            placeholder="Search products (e.g. Panda Dunks, Perfume)..." 
+            placeholder="Search products (e.g. Hand Couch, Panda Dunks)..." 
             required
             autocomplete="off"
             class="w-full px-6 py-5 pl-14 pr-40 bg-white border-4 border-slate-900 rounded-3xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-purple-400 shadow-[6px_6px_0px_#1e293b] transition-all text-xl"
@@ -136,12 +136,11 @@
       <!-- Popular Tags -->
       <div class="flex flex-wrap items-center justify-center gap-3 text-base text-slate-700">
         <span class="text-slate-500">Popular:</span>
+        <button type="button" onclick="searchTag('Hand Couch')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">Hand Couch</button>
         <button type="button" onclick="searchTag('Stanley Cup')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">Stanley Cup</button>
         <button type="button" onclick="searchTag('Lululemon')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">Lululemon</button>
         <button type="button" onclick="searchTag('UGG')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">UGG</button>
         <button type="button" onclick="searchTag('Dior')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">Dior</button>
-        <button type="button" onclick="searchTag('YSL')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">YSL</button>
-        <button type="button" onclick="searchTag('Laneige')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">Laneige</button>
       </div>
     </div>
 
@@ -154,6 +153,10 @@
         <span class="text-base text-slate-500">Popular items right now</span>
       </div>
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div onclick="searchTag('Hand Couch')" class="bg-amber-50 border-3 border-slate-900 hover:bg-pink-50 p-4 rounded-2xl cursor-pointer transition-all text-center shadow-[2px_2px_0px_#1e293b]">
+          <p class="text-base text-slate-900 truncate mb-1">Hand Couch</p>
+          <span class="text-sm text-orange-600">🔥 14.1k searches</span>
+        </div>
         <div onclick="searchTag('Nike Panda Dunks')" class="bg-amber-50 border-3 border-slate-900 hover:bg-pink-50 p-4 rounded-2xl cursor-pointer transition-all text-center shadow-[2px_2px_0px_#1e293b]">
           <p class="text-base text-slate-900 truncate mb-1">Panda Dunks</p>
           <span class="text-sm text-orange-600">🔥 12.5k searches</span>
@@ -170,54 +173,21 @@
           <p class="text-base text-slate-900 truncate mb-1">Dior Lip Oil</p>
           <span class="text-sm text-orange-600">🔥 6.6k searches</span>
         </div>
-        <div onclick="searchTag('Rhode Peptide')" class="bg-amber-50 border-3 border-slate-900 hover:bg-pink-50 p-4 rounded-2xl cursor-pointer transition-all text-center shadow-[2px_2px_0px_#1e293b]">
-          <p class="text-base text-slate-900 truncate mb-1">Rhode Peptide</p>
-          <span class="text-sm text-orange-600">🔥 5.3k searches</span>
-        </div>
         <div onclick="searchTag('Le Labo Santal 33')" class="bg-amber-50 border-3 border-slate-900 hover:bg-pink-50 p-4 rounded-2xl cursor-pointer transition-all text-center shadow-[2px_2px_0px_#1e293b]">
-          <p class="text-base text-slate-900 truncate mb-1">Santal 33</p>
+          <p class="text-sm text-slate-900 truncate mb-1">Santal 33</p>
           <span class="text-sm text-orange-600">🔥 4.7k searches</span>
         </div>
       </div>
     </div>
 
-    <!-- Explore Categories Section -->
-    <div class="mb-16">
-      <h3 class="text-slate-900 text-3xl mb-6">Explore Categories</h3>
-      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-        <div onclick="searchTag('Fashion handbag clothes')" class="bg-white border-3 border-slate-900 p-4 rounded-2xl text-center cursor-pointer hover:bg-pink-50 shadow-[3px_3px_0px_#1e293b] transition-all">
-          <div class="text-3xl mb-1">👜</div>
-          <p class="text-sm text-slate-900">Fashion</p>
-        </div>
-        <div onclick="searchTag('Shoes sneakers')" class="bg-white border-3 border-slate-900 p-4 rounded-2xl text-center cursor-pointer hover:bg-pink-50 shadow-[3px_3px_0px_#1e293b] transition-all">
-          <div class="text-3xl mb-1">👟</div>
-          <p class="text-sm text-slate-900">Shoes</p>
-        </div>
-        <div onclick="searchTag('Makeup lipstick gloss')" class="bg-white border-3 border-slate-900 p-4 rounded-2xl text-center cursor-pointer hover:bg-pink-50 shadow-[3px_3px_0px_#1e293b] transition-all">
-          <div class="text-3xl mb-1">💄</div>
-          <p class="text-sm text-slate-900">Makeup</p>
-        </div>
-        <div onclick="searchTag('Skincare serum lotion')" class="bg-white border-3 border-slate-900 p-4 rounded-2xl text-center cursor-pointer hover:bg-pink-50 shadow-[3px_3px_0px_#1e293b] transition-all">
-          <div class="text-3xl mb-1">🧴</div>
-          <p class="text-sm text-slate-900">Skincare</p>
-        </div>
-        <div onclick="searchTag('Watches luxury')" class="bg-white border-3 border-slate-900 p-4 rounded-2xl text-center cursor-pointer hover:bg-pink-50 shadow-[3px_3px_0px_#1e293b] transition-all">
-          <div class="text-3xl mb-1">⌚</div>
-          <p class="text-sm text-slate-900">Watches</p>
-        </div>
-        <div onclick="searchTag('Home decor candle')" class="bg-white border-3 border-slate-900 p-4 rounded-2xl text-center cursor-pointer hover:bg-pink-50 shadow-[3px_3px_0px_#1e293b] transition-all">
-          <div class="text-3xl mb-1">🕯️</div>
-          <p class="text-sm text-slate-900">Home</p>
-        </div>
-        <div onclick="searchTag('Tech headphones gadgets')" class="bg-white border-3 border-slate-900 p-4 rounded-2xl text-center cursor-pointer hover:bg-pink-50 shadow-[3px_3px_0px_#1e293b] transition-all">
-          <div class="text-3xl mb-1">🎧</div>
-          <p class="text-sm text-slate-900">Tech</p>
-        </div>
-        <div onclick="searchTag('Jewelry ring necklace')" class="bg-white border-3 border-slate-900 p-4 rounded-2xl text-center cursor-pointer hover:bg-pink-50 shadow-[3px_3px_0px_#1e293b] transition-all">
-          <div class="text-3xl mb-1">💍</div>
-          <p class="text-sm text-slate-900">Jewelry</p>
-        </div>
-      </div>
+    <!-- NEW: Condition & Type Filter Bar (New, Used, Real, Fake/Dupe) -->
+    <div id="filter-container" class="hidden flex flex-wrap items-center justify-center gap-3 mb-8">
+      <span class="text-slate-700 font-bold">Filter By:</span>
+      <button type="button" onclick="filterCondition('all')" class="filter-btn px-4 py-2 bg-purple-600 text-white border-3 border-slate-900 rounded-xl shadow-[2px_2px_0px_#1e293b] text-base transition-all">All Deals</button>
+      <button type="button" onclick="filterCondition('new')" class="filter-btn px-4 py-2 bg-white text-slate-900 border-3 border-slate-900 hover:bg-pink-100 rounded-xl shadow-[2px_2px_0px_#1e293b] text-base transition-all">✨ Brand New</button>
+      <button type="button" onclick="filterCondition('used')" class="filter-btn px-4 py-2 bg-white text-slate-900 border-3 border-slate-900 hover:bg-pink-100 rounded-xl shadow-[2px_2px_0px_#1e293b] text-base transition-all">♻️ Used / Pre-Loved</button>
+      <button type="button" onclick="filterCondition('dupe')" class="filter-btn px-4 py-2 bg-white text-slate-900 border-3 border-slate-900 hover:bg-pink-100 rounded-xl shadow-[2px_2px_0px_#1e293b] text-base transition-all">🪄 Cheap Dupe / Alternative</button>
+      <button type="button" onclick="filterCondition('real')" class="filter-btn px-4 py-2 bg-white text-slate-900 border-3 border-slate-900 hover:bg-pink-100 rounded-xl shadow-[2px_2px_0px_#1e293b] text-base transition-all">💎 Authentic / Real</button>
     </div>
 
     <!-- Loading Spinner -->
@@ -258,59 +228,27 @@
       </div>
     </div>
 
-    <!-- What Our Users Say -->
-    <div class="mb-16">
-      <h3 class="text-3xl sm:text-4xl text-center mb-10 text-slate-900">What Our Users Say 💖</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div class="bg-white border-4 border-slate-900 p-6 rounded-3xl shadow-[5px_5px_0px_#1e293b]">
-          <div class="text-amber-400 text-xl mb-3">⭐⭐⭐⭐⭐</div>
-          <p class="text-lg text-slate-700 mb-4">"I saved £180 on my handbag by finding the perfect dupe!"</p>
-          <p class="text-sm text-slate-900">— Emily R.</p>
-        </div>
-        <div class="bg-white border-4 border-slate-900 p-6 rounded-3xl shadow-[5px_5px_0px_#1e293b]">
-          <div class="text-amber-400 text-xl mb-3">⭐⭐⭐⭐⭐</div>
-          <p class="text-lg text-slate-700 mb-4">"This site is a game changer. Way better than searching TikTok for hours."</p>
-          <p class="text-sm text-slate-900">— Jake T.</p>
-        </div>
-        <div class="bg-white border-4 border-slate-900 p-6 rounded-3xl shadow-[5px_5px_0px_#1e293b]">
-          <div class="text-amber-400 text-xl mb-3">⭐⭐⭐⭐⭐</div>
-          <p class="text-lg text-slate-700 mb-4">"Found a perfume dupe in seconds and it smells identical!"</p>
-          <p class="text-sm text-slate-900">— Sarah K.</p>
-        </div>
-      </div>
-    </div>
-
   </main>
 
-  <!-- Gorgeous Dark Footer matching reference layout -->
+  <!-- Gorgeous Dark Footer -->
   <footer class="bg-slate-900 text-white border-t-4 border-slate-900 pt-16 pb-12">
     <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-5 gap-10 mb-12">
       <div class="md:col-span-2">
         <span class="text-3xl text-pink-400 mb-3 block">✨ DupeSpotter</span>
         <p class="text-base text-slate-400 mb-6 max-w-sm">Find magical alternative deals and stop overpaying for popular luxury products.</p>
-        <div class="flex items-center gap-4 text-xl">
-          <a href="#" class="w-10 h-10 bg-slate-800 border-2 border-slate-700 rounded-xl flex items-center justify-center hover:bg-pink-600 transition-colors">🎵</a>
-          <a href="#" class="w-10 h-10 bg-slate-800 border-2 border-slate-700 rounded-xl flex items-center justify-center hover:bg-pink-600 transition-colors">📸</a>
-          <a href="#" class="w-10 h-10 bg-slate-800 border-2 border-slate-700 rounded-xl flex items-center justify-center hover:bg-pink-600 transition-colors">🐦</a>
-          <a href="#" class="w-10 h-10 bg-slate-800 border-2 border-slate-700 rounded-xl flex items-center justify-center hover:bg-pink-600 transition-colors">💬</a>
-        </div>
       </div>
       <div>
         <h4 class="text-lg mb-4 text-pink-300">Search</h4>
         <ul class="space-y-2 text-base text-slate-400">
           <li><a href="#" class="hover:text-white transition-colors">All Products</a></li>
           <li><a href="#" class="hover:text-white transition-colors">Trending</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">Categories</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">Brands</a></li>
         </ul>
       </div>
       <div>
         <h4 class="text-lg mb-4 text-pink-300">Company</h4>
         <ul class="space-y-2 text-base text-slate-400">
           <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">Blog</a></li>
           <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">Careers</a></li>
         </ul>
       </div>
       <div>
@@ -318,8 +256,6 @@
         <ul class="space-y-2 text-base text-slate-400">
           <li><a href="#" class="hover:text-white transition-colors">API</a></li>
           <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">Guides</a></li>
-          <li><a href="#" class="hover:text-white transition-colors">Request a Brand</a></li>
         </ul>
       </div>
     </div>
@@ -328,7 +264,7 @@
     </div>
   </footer>
 
-  <!-- Helper Script for Tag Clicks -->
+  <!-- Helper Script -->
   <script>
     function searchTag(query) {
       const input = document.getElementById('search-input');
