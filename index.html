@@ -17,42 +17,42 @@
     body { font-family: 'Fredoka', sans-serif; }
     .cartoony-card {
       border: 3px solid #1e293b;
-      box-shadow: 4px 4px 0px #1e293b;
+      box-shadow: 5px 5px 0px #1e293b;
       transition: all 0.2s ease-in-out;
     }
     .cartoony-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 6px 8px 0px #1e293b;
+      transform: translateY(-5px);
+      box-shadow: 8px 10px 0px #1e293b;
     }
     .floating-card {
       background: white;
       border: 3px solid #1e293b;
       box-shadow: 6px 6px 0px #1e293b;
       border-radius: 1.5rem;
-      padding: 0.75rem;
-      width: 150px;
+      padding: 1rem;
+      width: 170px;
       position: absolute;
-      transform: rotate(-3deg);
+      transform: rotate(-4deg);
     }
     .floating-card-2 {
-      transform: rotate(4deg);
+      transform: rotate(5deg);
     }
   </style>
 </head>
 
-<body class="bg-gradient-to-b from-pink-50 via-purple-50 to-amber-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-pink-400 selection:text-white">
+<body class="bg-gradient-to-b from-pink-50 via-purple-50 to-amber-50 text-slate-900 min-h-screen flex flex-col justify-between selection:bg-pink-400 selection:text-white">
 
   <!-- Navigation Header -->
-  <header class="bg-white/80 backdrop-blur-md border-b-2 border-slate-200 sticky top-0 z-50">
+  <header class="bg-white/90 backdrop-blur-md border-b-3 border-slate-900 sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <span class="text-2xl font-bold tracking-tight text-pink-600 flex items-center gap-1">
+        <span class="text-3xl font-extrabold tracking-tight text-pink-600 drop-shadow-[2px_2px_0px_#1e293b]">
           ✨ DupeSpotter
         </span>
       </div>
       
       <!-- Nav Links -->
-      <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+      <nav class="hidden md:flex items-center gap-8 text-base font-bold text-slate-700">
         <a href="#" class="hover:text-pink-600 transition-colors">Features</a>
         <a href="#" class="hover:text-pink-600 transition-colors">About</a>
         <a href="#" class="hover:text-pink-600 transition-colors">Blog</a>
@@ -61,7 +61,7 @@
       </nav>
 
       <div class="flex items-center gap-3">
-        <span class="text-xs bg-pink-100 text-pink-700 border-2 border-pink-300 px-3 py-1.5 rounded-full font-bold">
+        <span class="text-sm bg-yellow-300 text-slate-900 border-2 border-slate-900 px-4 py-2 rounded-2xl font-black shadow-[2px_2px_0px_#1e293b]">
           🎨 dbestguy productions
         </span>
       </div>
@@ -69,38 +69,38 @@
   </header>
 
   <!-- Main Content Area -->
-  <main class="max-w-7xl mx-auto px-4 py-12 w-full flex-grow relative z-10">
+  <main class="max-w-7xl mx-auto px-4 py-16 w-full flex-grow relative z-10">
     
     <!-- Hero & Search Section with Decorative Floating Cards -->
     <div class="relative text-center max-w-3xl mx-auto mb-16 pt-6">
       
       <!-- Floating Card Top Left -->
-      <div class="hidden lg:block floating-card top-0 -left-20 text-left">
-        <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=200&auto=format&fit=crop&q=60" class="w-full h-24 object-cover rounded-xl border-2 border-slate-900 mb-2" alt="Bag">
-        <p class="text-xs font-bold text-slate-800 truncate">Jacquemus Le Chiquito</p>
-        <p class="text-xs font-black text-pink-600">£520</p>
+      <div class="hidden lg:block floating-card top-0 -left-24 text-left">
+        <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=200&auto=format&fit=crop&q=60" class="w-full h-28 object-cover rounded-xl border-2 border-slate-900 mb-2" alt="Bag">
+        <p class="text-sm font-bold text-slate-900 truncate">Jacquemus Bag</p>
+        <p class="text-sm font-black text-pink-600">£520</p>
       </div>
 
       <!-- Floating Card Top Right -->
-      <div class="hidden lg:block floating-card floating-card-2 top-2 -right-20 text-left">
-        <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=200&auto=format&fit=crop&q=60" class="w-full h-24 object-cover rounded-xl border-2 border-slate-900 mb-2" alt="Sneaker">
-        <p class="text-xs font-bold text-slate-800 truncate">Nike Panda Dunks</p>
-        <p class="text-xs font-black text-pink-600">£110</p>
+      <div class="hidden lg:block floating-card floating-card-2 top-2 -right-24 text-left">
+        <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=200&auto=format&fit=crop&q=60" class="w-full h-28 object-cover rounded-xl border-2 border-slate-900 mb-2" alt="Sneaker">
+        <p class="text-sm font-bold text-slate-900 truncate">Panda Dunks</p>
+        <p class="text-sm font-black text-pink-600">£110</p>
       </div>
 
       <!-- Main Headline -->
-      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 mb-4">
+      <h1 class="text-5xl sm:text-7xl font-black tracking-tight text-slate-900 mb-6 drop-shadow-[3px_3px_0px_#cbd5e1]">
         Stop Overpaying. 🛍️ <br />
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500">
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
           Find Cute Dupes Fast.
         </span>
       </h1>
-      <p class="text-slate-600 text-base sm:text-lg mb-8 font-medium">
+      <p class="text-slate-700 text-lg sm:text-xl mb-10 font-bold">
         Search any brand or product to uncover magical alternative deals! ✨
       </p>
 
       <!-- SEARCH FORM -->
-      <form id="search-form" class="relative max-w-xl mx-auto flex items-center mb-6">
+      <form id="search-form" class="relative max-w-2xl mx-auto flex items-center mb-8">
         <div class="relative w-full">
           <input 
             id="search-input"
@@ -108,88 +108,88 @@
             placeholder="Search products (e.g. Panda Dunks, Perfume)..." 
             required
             autocomplete="off"
-            class="w-full px-6 py-4 pl-12 pr-36 bg-white border-4 border-slate-900 rounded-3xl text-slate-800 placeholder-slate-400 font-medium focus:outline-none focus:ring-4 focus:ring-purple-400 shadow-[4px_4px_0px_#1e293b] transition-all text-base"
+            class="w-full px-6 py-5 pl-14 pr-40 bg-white border-4 border-slate-900 rounded-3xl text-slate-900 placeholder-slate-400 font-bold focus:outline-none focus:ring-4 focus:ring-purple-400 shadow-[6px_6px_0px_#1e293b] transition-all text-lg"
           />
-          <svg class="w-6 h-6 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <svg class="w-7 h-7 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
         </div>
         <button 
           type="submit" 
-          class="absolute right-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-2xl border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b] text-base transition-all active:translate-x-0.5 active:translate-y-0.5"
+          class="absolute right-2.5 px-7 py-3.5 bg-purple-600 hover:bg-purple-500 text-white font-black rounded-2xl border-3 border-slate-900 shadow-[3px_3px_0px_#1e293b] text-lg transition-all active:translate-x-0.5 active:translate-y-0.5"
         >
           Search ✨
         </button>
       </form>
 
       <!-- Popular Tags -->
-      <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-slate-600">
-        <span class="text-slate-400">Popular:</span>
-        <button type="button" onclick="searchTag('Stanley Cup')" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:border-slate-900 rounded-xl shadow-sm transition-all">Stanley Cup</button>
-        <button type="button" onclick="searchTag('Lululemon')" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:border-slate-900 rounded-xl shadow-sm transition-all">Lululemon</button>
-        <button type="button" onclick="searchTag('UGG')" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:border-slate-900 rounded-xl shadow-sm transition-all">UGG</button>
-        <button type="button" onclick="searchTag('Dior')" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:border-slate-900 rounded-xl shadow-sm transition-all">Dior</button>
-        <button type="button" onclick="searchTag('YSL')" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:border-slate-900 rounded-xl shadow-sm transition-all">YSL</button>
-        <button type="button" onclick="searchTag('Laneige')" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:border-slate-900 rounded-xl shadow-sm transition-all">Laneige</button>
+      <div class="flex flex-wrap items-center justify-center gap-3 text-sm font-bold text-slate-700">
+        <span class="text-slate-500 font-black">Popular:</span>
+        <button type="button" onclick="searchTag('Stanley Cup')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">Stanley Cup</button>
+        <button type="button" onclick="searchTag('Lululemon')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">Lululemon</button>
+        <button type="button" onclick="searchTag('UGG')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">UGG</button>
+        <button type="button" onclick="searchTag('Dior')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">Dior</button>
+        <button type="button" onclick="searchTag('YSL')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">YSL</button>
+        <button type="button" onclick="searchTag('Laneige')" class="px-4 py-2 bg-white border-3 border-slate-900 hover:bg-pink-100 rounded-2xl shadow-[2px_2px_0px_#1e293b] transition-all">Laneige</button>
       </div>
     </div>
 
     <!-- Trending Today Bar -->
-    <div class="bg-white border-3 border-slate-900 rounded-3xl p-5 mb-12 shadow-[4px_4px_0px_#1e293b]">
-      <div class="flex items-center justify-between mb-4">
-        <h3 class="font-black text-slate-900 text-base flex items-center gap-2">
+    <div class="bg-white border-4 border-slate-900 rounded-3xl p-6 mb-16 shadow-[6px_6px_0px_#1e293b]">
+      <div class="flex items-center justify-between mb-5">
+        <h3 class="font-black text-slate-900 text-xl flex items-center gap-2">
           🔥 Trending Today
         </h3>
-        <span class="text-xs font-bold text-slate-400">Popular items right now</span>
+        <span class="text-sm font-bold text-slate-500">Popular items right now</span>
       </div>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-        <div onclick="searchTag('Nike Panda Dunks')" class="bg-amber-50/50 border-2 border-slate-200 hover:border-slate-900 p-3 rounded-2xl cursor-pointer transition-all text-center">
-          <p class="font-bold text-xs text-slate-800 truncate">Nike Panda Dunks</p>
-          <span class="text-[10px] text-orange-500 font-bold">🔥 12.5k searches</span>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div onclick="searchTag('Nike Panda Dunks')" class="bg-amber-50 border-3 border-slate-900 hover:bg-pink-50 p-4 rounded-2xl cursor-pointer transition-all text-center shadow-[2px_2px_0px_#1e293b]">
+          <p class="font-black text-sm text-slate-900 truncate mb-1">Panda Dunks</p>
+          <span class="text-xs text-orange-600 font-extrabold">🔥 12.5k searches</span>
         </div>
-        <div onclick="searchTag('Laneige Lip Mask')" class="bg-amber-50/50 border-2 border-slate-200 hover:border-slate-900 p-3 rounded-2xl cursor-pointer transition-all text-center">
-          <p class="font-bold text-xs text-slate-800 truncate">Laneige Lip Mask</p>
-          <span class="text-[10px] text-orange-500 font-bold">🔥 8.2k searches</span>
+        <div onclick="searchTag('Laneige Lip Mask')" class="bg-amber-50 border-3 border-slate-900 hover:bg-pink-50 p-4 rounded-2xl cursor-pointer transition-all text-center shadow-[2px_2px_0px_#1e293b]">
+          <p class="font-black text-sm text-slate-900 truncate mb-1">Laneige Mask</p>
+          <span class="text-xs text-orange-600 font-extrabold">🔥 8.2k searches</span>
         </div>
-        <div onclick="searchTag('UGG Tasman')" class="bg-amber-50/50 border-2 border-slate-200 hover:border-slate-900 p-3 rounded-2xl cursor-pointer transition-all text-center">
-          <p class="font-bold text-xs text-slate-800 truncate">UGG Tasman</p>
-          <span class="text-[10px] text-orange-500 font-bold">🔥 7.9k searches</span>
+        <div onclick="searchTag('UGG Tasman')" class="bg-amber-50 border-3 border-slate-900 hover:bg-pink-50 p-4 rounded-2xl cursor-pointer transition-all text-center shadow-[2px_2px_0px_#1e293b]">
+          <p class="font-black text-sm text-slate-900 truncate mb-1">UGG Tasman</p>
+          <span class="text-xs text-orange-600 font-extrabold">🔥 7.9k searches</span>
         </div>
-        <div onclick="searchTag('Dior Lip Oil')" class="bg-amber-50/50 border-2 border-slate-200 hover:border-slate-900 p-3 rounded-2xl cursor-pointer transition-all text-center">
-          <p class="font-bold text-xs text-slate-800 truncate">Dior Lip Oil</p>
-          <span class="text-[10px] text-orange-500 font-bold">🔥 6.6k searches</span>
+        <div onclick="searchTag('Dior Lip Oil')" class="bg-amber-50 border-3 border-slate-900 hover:bg-pink-50 p-4 rounded-2xl cursor-pointer transition-all text-center shadow-[2px_2px_0px_#1e293b]">
+          <p class="font-black text-sm text-slate-900 truncate mb-1">Dior Lip Oil</p>
+          <span class="text-xs text-orange-600 font-extrabold">🔥 6.6k searches</span>
         </div>
-        <div onclick="searchTag('Rhode Peptide')" class="bg-amber-50/50 border-2 border-slate-200 hover:border-slate-900 p-3 rounded-2xl cursor-pointer transition-all text-center">
-          <p class="font-bold text-xs text-slate-800 truncate">Rhode Peptide</p>
-          <span class="text-[10px] text-orange-500 font-bold">🔥 5.3k searches</span>
+        <div onclick="searchTag('Rhode Peptide')" class="bg-amber-50 border-3 border-slate-900 hover:bg-pink-50 p-4 rounded-2xl cursor-pointer transition-all text-center shadow-[2px_2px_0px_#1e293b]">
+          <p class="font-black text-sm text-slate-900 truncate mb-1">Rhode Peptide</p>
+          <span class="text-xs text-orange-600 font-extrabold">🔥 5.3k searches</span>
         </div>
-        <div onclick="searchTag('Le Labo Santal 33')" class="bg-amber-50/50 border-2 border-slate-200 hover:border-slate-900 p-3 rounded-2xl cursor-pointer transition-all text-center">
-          <p class="font-bold text-xs text-slate-800 truncate">Le Labo Santal 33</p>
-          <span class="text-[10px] text-orange-500 font-bold">🔥 4.7k searches</span>
+        <div onclick="searchTag('Le Labo Santal 33')" class="bg-amber-50 border-3 border-slate-900 hover:bg-pink-50 p-4 rounded-2xl cursor-pointer transition-all text-center shadow-[2px_2px_0px_#1e293b]">
+          <p class="font-black text-sm text-slate-900 truncate mb-1">Santal 33</p>
+          <span class="text-xs text-orange-600 font-extrabold">🔥 4.7k searches</span>
         </div>
       </div>
     </div>
 
     <!-- Loading Spinner -->
     <div id="loading-spinner" class="hidden flex flex-col items-center justify-center my-16">
-      <div class="w-14 h-14 border-4 border-slate-900 border-t-pink-500 rounded-full animate-spin mb-4 shadow-[3px_3px_0px_#1e293b]"></div>
-      <p class="text-slate-700 font-bold text-base">Hunting down sweet deals across the web... 🕵️‍♀️</p>
+      <div class="w-16 h-16 border-4 border-slate-900 border-t-pink-500 rounded-full animate-spin mb-4 shadow-[4px_4px_0px_#1e293b]"></div>
+      <p class="text-slate-900 font-black text-lg">Hunting down sweet deals across the web... 🕵️‍♀️</p>
     </div>
 
     <!-- No Results Message -->
-    <div id="no-results" class="hidden text-center py-12 bg-white border-4 border-slate-900 rounded-3xl my-8 max-w-md mx-auto shadow-[6px_6px_0px_#1e293b]">
-      <div class="text-4xl mb-2">😿</div>
-      <h3 class="text-xl font-bold text-slate-900">No dupes found right now!</h3>
-      <p class="text-slate-600 text-sm mt-1 font-medium">Try searching for something a bit more general.</p>
+    <div id="no-results" class="hidden text-center py-12 bg-white border-4 border-slate-900 rounded-3xl my-8 max-w-lg mx-auto shadow-[6px_6px_0px_#1e293b]">
+      <div class="text-5xl mb-3">😿</div>
+      <h3 class="text-2xl font-black text-slate-900">No dupes found right now!</h3>
+      <p class="text-slate-700 text-base mt-2 font-bold">Try searching for something a bit more general.</p>
     </div>
 
     <!-- Results Grid Container -->
-    <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+    <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"></div>
 
   </main>
 
   <!-- Footer -->
-  <footer class="bg-white border-t-4 border-slate-900 py-8 text-center text-sm font-bold text-slate-700 relative z-10">
+  <footer class="bg-white border-t-4 border-slate-900 py-10 text-center text-base font-black text-slate-800 relative z-10">
     <p>© 2026 DupeSpotter. Powered by Serper.dev & dbestguy productions 🚀</p>
   </footer>
 
