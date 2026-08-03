@@ -1,4 +1,43 @@
-function renderResults(items) {
+document.addEventListener("DOMContentLoaded", () => {
+  const searchForm = document.getElementById("search-form");
+  const searchInput = document.getElementById("search-input");
+  const loadingSpinner = document.getElementById("loading-spinner");
+  const noResults = document.getElementById("no-results");
+  const resultsGrid = document.getElementById("results-grid");
+
+  if (searchForm) {
+    searchForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const query = searchInput.value.trim();
+      
+      if (!query) return;
+
+      if (loadingSpinner) loadingSpinner.classList.remove("hidden");
+      if (noResults) noResults.classList.add("hidden");
+      if (resultsGrid) resultsGrid.innerHTML = "";
+
+      try {
+        const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+        const data = await response.json();
+
+        if (loadingSpinner) loadingSpinner.classList.add("hidden");
+
+        const items = data.shopping || [];
+
+        if (items.length === 0) {
+          if (noResults) noResults.classList.remove("hidden");
+        } else {
+          renderResults(items);
+        }
+      } catch (error) {
+        console.error("Search failed:", error);
+        if (loadingSpinner) loadingSpinner.classList.add("hidden");
+        if (noResults) noResults.classList.remove("hidden");
+      }
+    });
+  }
+
+  function renderResults(items) {
     if (!resultsGrid) return;
     resultsGrid.innerHTML = "";
 
@@ -33,3 +72,4 @@ function renderResults(items) {
       resultsGrid.appendChild(card);
     });
   }
+});
