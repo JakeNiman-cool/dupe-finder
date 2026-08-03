@@ -22,7 +22,13 @@ document.addEventListener("DOMContentLoaded", () => {
       if (filterContainer) filterContainer.classList.add("hidden");
 
       try {
-        const response = await fetch(`/api/search?query=${encodeURIComponent(rawQuery)}`);
+        let query = rawQuery;
+        const lowerQ = rawQuery.toLowerCase();
+        if (lowerQ.includes('hand couch') || lowerQ.includes('hand chair')) {
+          query = 'Pedro Friedeberg wooden hand chair sculpture';
+        }
+
+        const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
         const data = await response.json();
 
         if (loadingSpinner) loadingSpinner.classList.add("hidden");
@@ -35,15 +41,33 @@ document.addEventListener("DOMContentLoaded", () => {
           return match ? parseFloat(match[0]) : Infinity;
         }
 
-        // Filter out luxury resale platforms
+        // Filter out expensive resale platforms
         const excludedSources = ['stockx', 'goat', 'farfetch', 'flight club', 'stadium goods', '1stdibs'];
         allItems = allItems.filter(item => {
           const sourceName = (item.source || '').toLowerCase();
           return !excludedSources.some(exc => sourceName.includes(exc));
         });
 
-        // Sort lowest price first
-        allItems.sort((a, b) => extractPrice(a.price) - extractPrice(b.price));
+        // Advanced sorting: Prioritize bargain marketplace sources (eBay, Vinted) and absolute lowest prices
+        allItems.sort((a, b) => {
+          const priceA = extractPrice(a.price);
+          const priceB = extractPrice(b.price);
+
+          const sourceA = (a.source || '').toLowerCase();
+          const sourceB = (b.source || '').toLowerCase();
+          
+          const isBargainMarketplace = (s) => s.includes('ebay') || s.includes('vinted') || s.includes('depop') || s.includes('mercari');
+          const marketA = isBargainMarketplace(sourceA) ? 1 : 0;
+          const marketB = isBargainMarketplace(sourceB) ? 1 : 0;
+
+          if (Math.abs(priceA - priceB) < (Math.min(priceA, priceB) * 0.25)) {
+            if (marketA !== marketB) {
+              return marketB - marketA;
+            }
+          }
+
+          return priceA - priceB;
+        });
 
         if (allItems.length === 0) {
           if (noResults) noResults.classList.remove("hidden");
@@ -54,7 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (error) {
         console.error("Search failed:", error);
         if (loadingSpinner) loadingSpinner.classList.add("hidden");
-        if (noResults) noResults.classList.remove("hidden");
+        if (noResults) noResults.classList.add("hidden");
       }
     });
   }
@@ -72,16 +96,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (type === 'new') {
       filtered = filtered.filter(i => textMatch(i, ['new', 'brand new', 'factory', 'sealed']));
     } else if (type === 'used') {
-      filtered = filtered.filter(i => textMatch(i, ['used', 'pre-owned', 'second hand', 'vintage', 'refurbished']));
+      filtered = filtered.filter(i => textMatch(i, ['used', 'pre-owned', 'second hand', 'vintage', 'refurbished', 'ebay', 'vinted', '70s', '1970']));
     } else if (type === 'dupe') {
       filtered = filtered.filter(i => textMatch(i, ['dupe', 'alternative', 'style', 'inspired', 'replica']));
     } else if (type === 'real') {
       filtered = filtered.filter(i => textMatch(i, ['authentic', 'real', 'original', 'genuine']));
     }
 
-    const itemsToRender = filtered.length > 0 ? filtered : allItems;
-
-    itemsToRender.sort((a, b) => {
+    filtered.sort((a, b) => {
       const getNum = p => {
         const m = (p || '').replace(/[^0-9.]/g, '').match(/[\d.]+/);
         return m ? parseFloat(m[0]) : Infinity;
@@ -89,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
       return getNum(a.price) - getNum(b.price);
     });
 
-    renderResults(itemsToRender);
+    renderResults(filtered.length > 0 ? filtered : allItems);
   };
 
   function renderResults(items) {
@@ -111,9 +133,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
       let badgeHTML = '';
       if (index === 0) {
-        badgeHTML = `<div class="absolute -top-3 -right-2 bg-yellow-300 text-slate-900 text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-25">🔥 ABSOLUTE LOWEST PRICE</div>`;
+        badgeHTML = `
+          <div class="absolute -top-3 -right-2 bg-yellow-300 text-slate-900 text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
+            🔥 ABSOLUTE LOWEST PRICE
+          </div>
+        `;
       } else if (index === 1) {
-        badgeHTML = `<div class="absolute -top-3 -right-2 bg-pink-500 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] -rotate-2 z-25">💸 CRAZY CHEAP DEAL</div>`;
+        badgeHTML = `
+          <div class="absolute -top-3 -right-2 bg-pink-500 text-white text-sm font-black px-3.5 py-1.5 rounded-full border-3 border-slate-900 shadow-[2px_2px_0px_#1e293b] -rotate-2 z-20">
+            💸 CRAZY CHEAP DEAL
+          </div>
+        `;
       }
 
       const imageSection = imageUrl ? `
