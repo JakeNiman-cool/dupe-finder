@@ -62,34 +62,33 @@ function renderProducts(products) {
     grid.innerHTML = '';
 
     if (products.length === 0) {
-        grid.innerHTML = '<p class="col-span-full text-center text-slate-500 py-12">No dupes found for that term. Try another item or brand!</p>';
+        grid.innerHTML = '<p class="col-span-full text-center text-slate-400 py-12 bg-slate-800/40 rounded-2xl border border-slate-800">No dupes found for that term. Try another item or brand!</p>';
         resultsSection.classList.remove('hidden');
         return;
     }
 
-    const maxPrice = Math.max(...products.map(p => p.price));
-
-    products.forEach((product) => {
-        const discountPercentage = maxPrice > 0 ? Math.round(((maxPrice - product.price) / maxPrice) * 100) : 0;
+    products.forEach((product, index) => {
+        const isBestDeal = index === 0; // First product is cheapest after sorting
 
         const card = document.createElement('div');
-        card.className = "bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition duration-200 flex flex-col justify-between";
+        card.className = "bg-slate-800/50 backdrop-blur-sm rounded-2xl border border-slate-700/60 p-4 hover:border-indigo-500/50 hover:-translate-y-1.5 transition-all duration-300 flex flex-col justify-between group shadow-xl";
 
         card.innerHTML = `
             <div>
-                <div class="relative bg-slate-100 aspect-square flex items-center justify-center overflow-hidden">
-                    <img src="${product.image}" alt="${product.title}" class="object-contain h-full w-full p-4 hover:scale-105 transition duration-300" loading="lazy">
-                    ${discountPercentage > 15 ? `<span class="absolute top-3 left-3 bg-emerald-500 text-white text-xs font-bold px-2 py-1 rounded-md shadow-sm">${discountPercentage}% LESS</span>` : ''}
+                <div class="relative bg-white rounded-xl aspect-square flex items-center justify-center overflow-hidden mb-4 p-4">
+                    <img src="${product.image}" alt="${product.title}" class="object-contain h-full w-full group-hover:scale-110 transition duration-300" loading="lazy">
+                    ${isBestDeal ? `<span class="absolute top-2 left-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] font-extrabold tracking-wider uppercase px-2.5 py-1 rounded-full shadow-lg">🔥 BEST VALUE</span>` : ''}
                 </div>
-                <div class="p-4">
-                    <p class="text-xs text-indigo-600 font-semibold uppercase tracking-wider mb-1">${product.source}</p>
-                    <h3 class="font-medium text-slate-900 text-sm line-clamp-2 mb-2" title="${product.title}">${product.title}</h3>
+                <div>
+                    <p class="text-[11px] text-indigo-400 font-bold uppercase tracking-wider mb-1">${product.source}</p>
+                    <h3 class="font-medium text-slate-100 text-sm line-clamp-2 mb-3 group-hover:text-white transition" title="${product.title}">${product.title}</h3>
                 </div>
             </div>
-            <div class="p-4 pt-0 border-t border-slate-50 flex items-center justify-between mt-auto">
-                <span class="text-lg font-bold text-slate-900">${product.rawPrice || '$' + product.price}</span>
-                <a href="${product.link}" target="_blank" rel="noopener noreferrer" class="text-xs bg-slate-900 hover:bg-indigo-600 text-white font-semibold px-3 py-2 rounded-lg transition duration-200">
-                    Shop Dupe ↗
+            <div class="pt-3 border-t border-slate-700/60 flex items-center justify-between mt-auto">
+                <span class="text-base font-extrabold text-white">${product.rawPrice || '$' + product.price}</span>
+                <a href="${product.link}" target="_blank" rel="noopener noreferrer" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-3.5 py-2 rounded-xl transition duration-200 shadow-md shadow-indigo-600/20 flex items-center gap-1">
+                    <span>Shop</span>
+                    <span class="text-indigo-200">↗</span>
                 </a>
             </div>
         `;
