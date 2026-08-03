@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DupeSpotter - Find Smart Product Alternatives</title>
+  <title>DupeSpotter - Find Cute Dupes Fast</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -24,56 +24,83 @@
       transform: translateY(-4px);
       box-shadow: 6px 8px 0px #1e293b;
     }
-    .cartoony-button {
+    .floating-card {
+      background: white;
       border: 3px solid #1e293b;
-      box-shadow: 3px 3px 0px #1e293b;
-      transition: all 0.1s ease-in-out;
+      box-shadow: 6px 6px 0px #1e293b;
+      border-radius: 1.5rem;
+      padding: 0.75rem;
+      width: 150px;
+      position: absolute;
+      transform: rotate(-3deg);
     }
-    .cartoony-button:active {
-      transform: translate(2px, 2px);
-      box-shadow: 1px 1px 0px #1e293b;
+    .floating-card-2 {
+      transform: rotate(4deg);
     }
   </style>
 </head>
 
-<body class="bg-amber-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-pink-400 selection:text-white">
-
-  <!-- Cute Background Blobs -->
-  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0 opacity-40">
-    <div class="absolute -top-20 -left-20 w-80 h-80 bg-pink-300 rounded-full blur-2xl"></div>
-    <div class="absolute top-1/4 -right-20 w-80 h-80 bg-purple-300 rounded-full blur-2xl"></div>
-    <div class="absolute bottom-10 left-1/3 w-80 h-80 bg-yellow-200 rounded-full blur-2xl"></div>
-  </div>
+<body class="bg-gradient-to-b from-pink-50 via-purple-50 to-amber-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-pink-400 selection:text-white">
 
   <!-- Navigation Header -->
-  <header class="bg-white/85 backdrop-blur-md border-b-4 border-slate-900 sticky top-0 z-50">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+  <header class="bg-white/80 backdrop-blur-md border-b-2 border-slate-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-2">
-        <span class="text-3xl font-bold tracking-tight text-pink-600 drop-shadow-[2px_2px_0px_#1e293b]">
+        <span class="text-2xl font-bold tracking-tight text-pink-600 flex items-center gap-1">
           ✨ DupeSpotter
         </span>
       </div>
-      <span class="text-xs bg-yellow-300 text-slate-900 border-2 border-slate-900 px-3 py-1 rounded-xl font-bold shadow-[2px_2px_0px_#1e293b]">
-        🎨 dbestguy productions
-      </span>
+      
+      <!-- Nav Links -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+        <a href="#" class="hover:text-pink-600 transition-colors">Features</a>
+        <a href="#" class="hover:text-pink-600 transition-colors">About</a>
+        <a href="#" class="hover:text-pink-600 transition-colors">Blog</a>
+        <a href="#" class="hover:text-pink-600 transition-colors">API</a>
+        <a href="#" class="hover:text-pink-600 transition-colors">Contact</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <span class="text-xs bg-pink-100 text-pink-700 border-2 border-pink-300 px-3 py-1.5 rounded-full font-bold">
+          🎨 dbestguy productions
+        </span>
+      </div>
     </div>
   </header>
 
   <!-- Main Content Area -->
-  <main class="max-w-6xl mx-auto px-4 py-12 w-full flex-grow relative z-10">
+  <main class="max-w-7xl mx-auto px-4 py-12 w-full flex-grow relative z-10">
     
-    <!-- Hero & Search Section -->
-    <div class="text-center max-w-2xl mx-auto mb-14">
-      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 mb-4 drop-shadow-[3px_3px_0px_#cbd5e1]">
-        Stop Overpaying! 🛍️ <br />
-        <span class="text-purple-600">Find Cute Dupes Fast.</span>
+    <!-- Hero & Search Section with Decorative Floating Cards -->
+    <div class="relative text-center max-w-3xl mx-auto mb-16 pt-6">
+      
+      <!-- Floating Card Top Left -->
+      <div class="hidden lg:block floating-card top-0 -left-20 text-left">
+        <img src="https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=200&auto=format&fit=crop&q=60" class="w-full h-24 object-cover rounded-xl border-2 border-slate-900 mb-2" alt="Bag">
+        <p class="text-xs font-bold text-slate-800 truncate">Jacquemus Le Chiquito</p>
+        <p class="text-xs font-black text-pink-600">£520</p>
+      </div>
+
+      <!-- Floating Card Top Right -->
+      <div class="hidden lg:block floating-card floating-card-2 top-2 -right-20 text-left">
+        <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=200&auto=format&fit=crop&q=60" class="w-full h-24 object-cover rounded-xl border-2 border-slate-900 mb-2" alt="Sneaker">
+        <p class="text-xs font-bold text-slate-800 truncate">Nike Panda Dunks</p>
+        <p class="text-xs font-black text-pink-600">£110</p>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 mb-4">
+        Stop Overpaying. 🛍️ <br />
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-500">
+          Find Cute Dupes Fast.
+        </span>
       </h1>
-      <p class="text-slate-600 text-lg mb-8 font-medium">
-        Search any brand or product to uncover magical alternative deals!
+      <p class="text-slate-600 text-base sm:text-lg mb-8 font-medium">
+        Search any brand or product to uncover magical alternative deals! ✨
       </p>
 
       <!-- SEARCH FORM -->
-      <form id="search-form" class="relative max-w-xl mx-auto flex items-center">
+      <form id="search-form" class="relative max-w-xl mx-auto flex items-center mb-6">
         <div class="relative w-full">
           <input 
             id="search-input"
@@ -81,19 +108,66 @@
             placeholder="Search products (e.g. Panda Dunks, Perfume)..." 
             required
             autocomplete="off"
-            class="w-full px-6 py-4 pl-12 pr-36 bg-white border-4 border-slate-900 rounded-2xl text-slate-800 placeholder-slate-400 font-medium focus:outline-none focus:ring-4 focus:ring-purple-400 shadow-[4px_4px_0px_#1e293b] transition-all text-base"
+            class="w-full px-6 py-4 pl-12 pr-36 bg-white border-4 border-slate-900 rounded-3xl text-slate-800 placeholder-slate-400 font-medium focus:outline-none focus:ring-4 focus:ring-purple-400 shadow-[4px_4px_0px_#1e293b] transition-all text-base"
           />
-          <svg class="w-6 h-6 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
         </div>
         <button 
           type="submit" 
-          class="absolute right-2 px-6 py-3 bg-pink-500 hover:bg-pink-400 text-white font-bold rounded-xl cartoony-button text-base"
+          class="absolute right-2 px-6 py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-2xl border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b] text-base transition-all active:translate-x-0.5 active:translate-y-0.5"
         >
-          Search 🔍
+          Search ✨
         </button>
       </form>
+
+      <!-- Popular Tags -->
+      <div class="flex flex-wrap items-center justify-center gap-2 text-xs font-bold text-slate-600">
+        <span class="text-slate-400">Popular:</span>
+        <button type="button" onclick="searchTag('Stanley Cup')" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:border-slate-900 rounded-xl shadow-sm transition-all">Stanley Cup</button>
+        <button type="button" onclick="searchTag('Lululemon')" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:border-slate-900 rounded-xl shadow-sm transition-all">Lululemon</button>
+        <button type="button" onclick="searchTag('UGG')" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:border-slate-900 rounded-xl shadow-sm transition-all">UGG</button>
+        <button type="button" onclick="searchTag('Dior')" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:border-slate-900 rounded-xl shadow-sm transition-all">Dior</button>
+        <button type="button" onclick="searchTag('YSL')" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:border-slate-900 rounded-xl shadow-sm transition-all">YSL</button>
+        <button type="button" onclick="searchTag('Laneige')" class="px-3 py-1.5 bg-white border-2 border-slate-300 hover:border-slate-900 rounded-xl shadow-sm transition-all">Laneige</button>
+      </div>
+    </div>
+
+    <!-- Trending Today Bar -->
+    <div class="bg-white border-3 border-slate-900 rounded-3xl p-5 mb-12 shadow-[4px_4px_0px_#1e293b]">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-black text-slate-900 text-base flex items-center gap-2">
+          🔥 Trending Today
+        </h3>
+        <span class="text-xs font-bold text-slate-400">Popular items right now</span>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div onclick="searchTag('Nike Panda Dunks')" class="bg-amber-50/50 border-2 border-slate-200 hover:border-slate-900 p-3 rounded-2xl cursor-pointer transition-all text-center">
+          <p class="font-bold text-xs text-slate-800 truncate">Nike Panda Dunks</p>
+          <span class="text-[10px] text-orange-500 font-bold">🔥 12.5k searches</span>
+        </div>
+        <div onclick="searchTag('Laneige Lip Mask')" class="bg-amber-50/50 border-2 border-slate-200 hover:border-slate-900 p-3 rounded-2xl cursor-pointer transition-all text-center">
+          <p class="font-bold text-xs text-slate-800 truncate">Laneige Lip Mask</p>
+          <span class="text-[10px] text-orange-500 font-bold">🔥 8.2k searches</span>
+        </div>
+        <div onclick="searchTag('UGG Tasman')" class="bg-amber-50/50 border-2 border-slate-200 hover:border-slate-900 p-3 rounded-2xl cursor-pointer transition-all text-center">
+          <p class="font-bold text-xs text-slate-800 truncate">UGG Tasman</p>
+          <span class="text-[10px] text-orange-500 font-bold">🔥 7.9k searches</span>
+        </div>
+        <div onclick="searchTag('Dior Lip Oil')" class="bg-amber-50/50 border-2 border-slate-200 hover:border-slate-900 p-3 rounded-2xl cursor-pointer transition-all text-center">
+          <p class="font-bold text-xs text-slate-800 truncate">Dior Lip Oil</p>
+          <span class="text-[10px] text-orange-500 font-bold">🔥 6.6k searches</span>
+        </div>
+        <div onclick="searchTag('Rhode Peptide')" class="bg-amber-50/50 border-2 border-slate-200 hover:border-slate-900 p-3 rounded-2xl cursor-pointer transition-all text-center">
+          <p class="font-bold text-xs text-slate-800 truncate">Rhode Peptide</p>
+          <span class="text-[10px] text-orange-500 font-bold">🔥 5.3k searches</span>
+        </div>
+        <div onclick="searchTag('Le Labo Santal 33')" class="bg-amber-50/50 border-2 border-slate-200 hover:border-slate-900 p-3 rounded-2xl cursor-pointer transition-all text-center">
+          <p class="font-bold text-xs text-slate-800 truncate">Le Labo Santal 33</p>
+          <span class="text-[10px] text-orange-500 font-bold">🔥 4.7k searches</span>
+        </div>
+      </div>
     </div>
 
     <!-- Loading Spinner -->
@@ -118,6 +192,18 @@
   <footer class="bg-white border-t-4 border-slate-900 py-8 text-center text-sm font-bold text-slate-700 relative z-10">
     <p>© 2026 DupeSpotter. Powered by Serper.dev & dbestguy productions 🚀</p>
   </footer>
+
+  <!-- Helper Script for Tag Clicks -->
+  <script>
+    function searchTag(query) {
+      const input = document.getElementById('search-input');
+      const form = document.getElementById('search-form');
+      if(input && form) {
+        input.value = query;
+        form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }
+    }
+  </script>
 
   <!-- Main JS Application Logic -->
   <script src="app.js"></script>
