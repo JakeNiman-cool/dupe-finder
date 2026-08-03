@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("search-input");
   const genderSelect = document.getElementById("gender-select");
   const sizeSelect = document.getElementById("size-select");
+  const clearFiltersBtn = document.getElementById("clear-filters-btn");
   const loadingSpinner = document.getElementById("loading-spinner");
   const noResults = document.getElementById("no-results");
   const resultsGrid = document.getElementById("results-grid");
@@ -13,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentFilter = 'all';
   let activeCategory = '';
 
-  // --- Size Hover Options Handler ---
+  // --- Size Hover Option Selection ---
   document.querySelectorAll(".size-opt").forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -30,6 +31,42 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+
+  // --- Category Direct Button Clicks ---
+  document.querySelectorAll("#vinted-categories > button[data-category]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      activeCategory = btn.dataset.category || '';
+      if (searchInput.value.trim()) {
+        performSearch(searchInput.value.trim());
+      }
+    });
+  });
+
+  // --- Clear Filters Button Logic ---
+  if (clearFiltersBtn) {
+    clearFiltersBtn.addEventListener("click", () => {
+      if (genderSelect) genderSelect.value = '';
+      if (sizeSelect) sizeSelect.value = '';
+      activeCategory = '';
+
+      if (searchInput.value.trim()) {
+        performSearch(searchInput.value.trim());
+      }
+    });
+  }
+
+  // --- Dropdown Change Listeners ---
+  if (genderSelect) {
+    genderSelect.addEventListener("change", () => {
+      if (searchInput.value.trim()) performSearch(searchInput.value.trim());
+    });
+  }
+
+  if (sizeSelect) {
+    sizeSelect.addEventListener("change", () => {
+      if (searchInput.value.trim()) performSearch(searchInput.value.trim());
+    });
+  }
 
   // --- Load Recent Searches ---
   function loadRecentSearches() {
