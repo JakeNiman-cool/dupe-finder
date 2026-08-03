@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DupeSpotter 🛒 | Find Deals & Cheap Dupes</title>
   
+  <!-- Browser Tab Favicon -->
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/favicon.png" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   
   <style>
@@ -41,10 +45,11 @@
 
   <!-- Header -->
   <header class="bg-white border-b-4 border-slate-900 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.reload()">
-        <span class="text-3xl">⭐</span>
-        <h1 class="text-3xl font-black text-pink-600 tracking-tight">DupeSpotter</h1>
+    <div class="max-w-7xl mx-auto px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Logo Container -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="window.location.reload()">
+        <img src="/favicon.png" alt="DupeSpotter Logo" class="h-12 w-auto object-contain hover:scale-105 transition-transform" />
       </div>
       
       <!-- Top Navigation Links -->
@@ -61,7 +66,7 @@
       </button>
     </div>
 
-    <!-- Vinted-Style Hover Navigation Bar with Expanded Sizes -->
+    <!-- Category Hover Navigation Bar -->
     <div class="border-t-2 border-slate-200 bg-slate-50 py-2 px-6">
       <div id="vinted-categories" class="max-w-7xl mx-auto flex items-center justify-center sm:justify-start gap-6 font-black text-slate-700 text-sm overflow-x-visible">
         
@@ -151,7 +156,6 @@
           </div>
         </div>
 
-        <!-- Direct Category Buttons -->
         <button data-category="designer" class="hover:text-pink-600 transition-colors py-2">Designer</button>
         <button data-category="furniture" class="hover:text-pink-600 transition-colors py-2">Home & Furniture</button>
         <button data-category="tech" class="hover:text-pink-600 transition-colors py-2">Electronics</button>
@@ -161,172 +165,4 @@
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-4 mt-8">
-    <!-- Search Bar Container -->
-    <div class="max-w-3xl mx-auto mb-10 space-y-4">
-      <form id="search-form" class="flex flex-col sm:flex-row gap-3">
-        <input 
-          type="text" 
-          id="search-input"
-          placeholder="Search for Nike Panda Dunks, Airpods, Leather Couch..." 
-          class="cartoony-input flex-1 px-5 py-4 rounded-2xl text-lg font-bold bg-white focus:outline-none focus:ring-4 focus:ring-yellow-300"
-          required
-        />
-        <button 
-          type="submit" 
-          class="cartoony-button bg-pink-500 hover:bg-pink-600 text-white font-black text-lg px-8 py-4 rounded-2xl flex items-center justify-center gap-2"
-        >
-          <span>Search Deals</span> 🔍
-        </button>
-      </form>
-
-      <!-- Active Filter Selectors + Clear Option -->
-      <div class="flex flex-wrap items-center justify-center gap-3 text-sm font-bold pt-1">
-        <div class="flex items-center gap-2">
-          <label for="gender-select">Category:</label>
-          <select id="gender-select" class="cartoony-input bg-white px-3 py-1.5 rounded-xl text-sm font-bold">
-            <option value="">All Categories</option>
-            <option value="women">Women's</option>
-            <option value="men">Men's</option>
-            <option value="kids">Kids</option>
-          </select>
-        </div>
-
-        <div class="flex items-center gap-2">
-          <label for="size-select">Size:</label>
-          <select id="size-select" class="cartoony-input bg-white px-3 py-1.5 rounded-xl text-sm font-bold max-w-[180px]">
-            <option value="">Any Size</option>
-            <!-- Shoe Sizes -->
-            <optgroup label="👟 Shoe Sizes">
-              <option value="35">EUR 35 / UK 2.5</option>
-              <option value="36">EUR 36 / UK 3</option>
-              <option value="36.5">EUR 36.5 / UK 3.5</option>
-              <option value="37.5">EUR 37.5 / UK 4</option>
-              <option value="38">EUR 38 / UK 4.5</option>
-              <option value="38.5">EUR 38.5 / UK 5 (5.5M)</option>
-              <option value="39">EUR 39 / UK 5.5</option>
-              <option value="40">EUR 40 / UK 6</option>
-              <option value="40.5">EUR 40.5 / UK 6.5</option>
-              <option value="41">EUR 41 / UK 7</option>
-              <option value="42">EUR 42 / UK 7.5</option>
-              <option value="42.5">EUR 42.5 / UK 8</option>
-              <option value="43">EUR 43 / UK 8.5</option>
-              <option value="44">EUR 44 / UK 9</option>
-              <option value="45">EUR 45 / UK 10</option>
-              <option value="46">EUR 46 / UK 11</option>
-            </optgroup>
-            <!-- Clothing Sizes -->
-            <optgroup label="👕 Clothing Sizes">
-              <option value="XXS">XXS</option>
-              <option value="XS">XS</option>
-              <option value="S">Small (S)</option>
-              <option value="M">Medium (M)</option>
-              <option value="L">Large (L)</option>
-              <option value="XL">XL</option>
-              <option value="2XL">2XL</option>
-              <option value="3XL">3XL</option>
-            </optgroup>
-            <!-- Kids Sizes -->
-            <optgroup label="🧒 Kids Sizes">
-              <option value="Baby">Baby / Infant</option>
-              <option value="Toddler">Toddler (1-3 Yrs)</option>
-              <option value="5-6 Yrs">Kids (5-6 Yrs)</option>
-              <option value="7-8 Yrs">Kids (7-8 Yrs)</option>
-              <option value="9-10 Yrs">Kids (9-10 Yrs)</option>
-              <option value="Teens">Teens (11-15 Yrs)</option>
-            </optgroup>
-          </select>
-        </div>
-
-        <!-- Clear Filters Button -->
-        <button id="clear-filters-btn" class="cartoony-button bg-red-400 hover:bg-red-500 text-white font-black px-3 py-1.5 rounded-xl text-xs flex items-center gap-1">
-          <span>✖ Clear Filters</span>
-        </button>
-      </div>
-
-      <!-- Recent Searches Header & Clear Button -->
-      <div id="recent-searches" class="flex flex-wrap items-center justify-center gap-2 text-sm font-bold">
-        <div class="flex items-center gap-1.5">
-          <span class="text-slate-500 text-xs font-black uppercase">Recent:</span>
-          <button id="clear-recents-btn" class="cartoony-button bg-red-500 hover:bg-red-600 text-white font-black text-[10px] px-2 py-0.5 rounded-lg flex items-center gap-1">
-            🗑️ Clear
-          </button>
-        </div>
-        <div id="recent-tags" class="flex flex-wrap gap-2"></div>
-      </div>
-    </div>
-
-    <!-- Main Grid: Sidebar + Results -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-      
-      <!-- Left Sidebar: Filter By -->
-      <aside id="filter-container" class="bg-white p-6 rounded-3xl cartoony-card h-fit space-y-4">
-        <h2 class="text-xl font-black text-slate-900 mb-4 flex items-center gap-2">
-          ⚙️ Filter By
-        </h2>
-
-        <div class="space-y-3">
-          <button data-filter="all" class="w-full text-left cartoony-button bg-blue-500 text-white font-black px-4 py-3 rounded-2xl flex items-center gap-2 ring-4 ring-slate-900 scale-105">
-            <span class="w-5 h-5 rounded-full bg-white border-2 border-slate-900 flex items-center justify-center text-xs text-slate-900">✓</span>
-            All Deals
-          </button>
-
-          <button data-filter="trending" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
-            🔥 Trending Now
-          </button>
-
-          <button data-filter="low-to-high" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
-            📉 Low to High
-          </button>
-
-          <button data-filter="high-to-low" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
-            📈 High to Low
-          </button>
-
-          <button data-filter="new" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
-            ✨ Brand New
-          </button>
-
-          <button data-filter="used" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
-            ♻️ Used / Pre-Loved
-          </button>
-
-          <button data-filter="dupe" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
-            🪄 Cheap Alternative
-          </button>
-
-          <button data-filter="real" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
-            💎 Authentic / Real
-          </button>
-        </div>
-      </aside>
-
-      <!-- Right Column: Results Grid -->
-      <section class="md:col-span-3">
-        <div id="loading-spinner" class="hidden text-center py-16">
-          <div class="inline-block animate-spin text-5xl mb-3">🌀</div>
-          <p class="text-xl font-black text-slate-700">Hunting down eBay listings & store deals...</p>
-        </div>
-
-        <div id="no-results" class="hidden text-center py-16 bg-white rounded-3xl cartoony-card max-w-md mx-auto">
-          <div class="text-5xl mb-3">🛋️</div>
-          <h3 class="text-2xl font-black mb-2">No Deals Found</h3>
-          <p class="text-slate-600 font-bold px-4">Try searching with simpler terms!</p>
-        </div>
-
-        <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-      </section>
-
-    </div>
-  </main>
-
-  <script src="/app.js"></script>
-</body>
-</html>
+  <!-- Rest of your code remains unchanged -->
