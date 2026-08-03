@@ -24,6 +24,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const items = data.shopping || [];
 
+        // Debug log the first item to inspect keys
+        if (items.length > 0) {
+          console.log("FIRST SHOPPING ITEM KEYS:", Object.keys(items[0]));
+          console.log("FIRST SHOPPING ITEM DATA:", items[0]);
+        }
+
         if (items.length === 0) {
           if (noResults) noResults.classList.remove("hidden");
         } else {
@@ -45,10 +51,9 @@ document.addEventListener("DOMContentLoaded", () => {
       const card = document.createElement("div");
       card.className = "bg-slate-800/60 border border-slate-700/80 rounded-2xl p-5 flex flex-col justify-between hover:border-purple-500/50 transition-all shadow-lg group";
       
-      // Check for thumbnail or image property from API response
-      const imageUrl = item.thumbnail || item.image;
+      // Check multiple possible key names for the image URL
+      const imageUrl = item.imageUrl || item.thumbnail || item.image || item.photo;
 
-      // Only generate the image HTML block if an image actually exists
       const imageSection = imageUrl ? `
         <div class="w-full h-48 bg-slate-900/50 rounded-xl overflow-hidden mb-4 flex items-center justify-center p-2 border border-slate-700/50">
           <img src="${imageUrl}" alt="${item.title}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300" />
