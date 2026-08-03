@@ -5,70 +5,119 @@ document.addEventListener("DOMContentLoaded", () => {
   const noResults = document.getElementById("no-results");
   const resultsGrid = document.getElementById("results-grid");
   const filterContainer = document.getElementById("filter-container");
+  const recentTagsContainer = document.getElementById("recent-tags");
 
   let allItems = [];
-  let currentFilter = 'low-to-high';
+  let currentFilter = 'all';
 
-  // --- Click Handler for Sidebar Buttons ---
+  // --- Load Recent Searches ---
+  function loadRecentSearches() {
+    if (!recentTagsContainer) return;
+    const history = JSON.parse(localStorage.getItem("recent_searches") || "[]");
+    recentTagsContainer.innerHTML = "";
+
+    if (history.length === 0) {
+      recentTagsContainer.innerHTML = `<span class="text-slate-400 text-xs">No recent searches</span>`;
+      return;
+    }
+
+    history.forEach(term => {
+      const tag = document.createElement("button");
+      tag.className = "cartoony-button bg-yellow-200 hover:bg-yellow-300 text-slate-900 text-xs px-2.5 py-1 rounded-xl font-bold border-2 border-slate-900";
+      tag.textContent = term;
+      tag.addEventListener("click", () => {
+        searchInput.value = term;
+        performSearch(term);
+      });
+      recentTagsContainer.appendChild(tag);
+    });
+  }
+
+  function saveRecentSearch(term) {
+    let history = JSON.parse(localStorage.getItem("recent_searches") || "[]");
+    history = history.filter(item => item.toLowerCase() !== term.toLowerCase());
+    history.unshift(term);
+    if (history.length > 5) history.pop(); // Keep last 5 searches
+    localStorage.setItem("recent_searches", JSON.stringify(history));
+    loadRecentSearches();
+  }
+
+  loadRecentSearches();
+
+  // --- Sidebar Button Handlers ---
   if (filterContainer) {
     const filterButtons = filterContainer.querySelectorAll("button[data-filter]");
+    
     filterButtons.forEach(btn => {
       btn.addEventListener("click", (e) => {
-        // Clear active outline styling from all buttons
-        filterButtons.forEach(b => b.classList.remove("ring-4", "ring-slate-900", "scale-105"));
-        
-        // Add active outline to clicked button
-        e.currentTarget.classList.add("ring-4", "ring-slate-900", "scale-105");
+        filterButtons.forEach(b => {
+          b.className = "w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2";
+          const iconSpan = b.querySelector("span");
+          if (iconSpan) {
+            iconSpan.className = "w-5 h-5 rounded-full border-2 border-slate-900";
+            iconSpan.innerHTML = "";
+          }
+        });
 
-        const filterType = e.currentTarget.dataset.filter;
+        const target = e.currentTarget;
+        target.className = "w-full text-left cartoony-button bg-blue-500 text-white font-black px-4 py-3 rounded-2xl flex items-center gap-2 ring-4 ring-slate-900 scale-105";
+        const targetIcon = target.querySelector("span");
+        if (targetIcon) {
+          targetIcon.className = "w-5 h-5 rounded-full bg-white border-2 border-slate-900 flex items-center justify-center text-xs text-slate-900";
+          targetIcon.innerHTML = "✓";
+        }
+
+        const filterType = target.dataset.filter;
         applyFilter(filterType);
       });
     });
   }
 
-  // --- Form Search Handler ---
-  if (searchForm) {
-    searchForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const rawQuery = searchInput.value.trim();
+  // --- Search Execution ---
+  async function performSearch(rawQuery) {
+    if (!rawQuery) return;
+
+    saveRecentSearch(rawQuery);
+
+    if (loadingSpinner) loadingSpinner.classList.remove("hidden");
+    if (noResults) noResults.classList.add("hidden");
+    if (resultsGrid) resultsGrid.innerHTML = "";
+
+    try {
+      let query = rawQuery;
+      const lowerQ = rawQuery.toLowerCase();
       
-      if (!rawQuery) return;
-
-      if (loadingSpinner) loadingSpinner.classList.remove("hidden");
-      if (noResults) noResults.classList.add("hidden");
-      if (resultsGrid) resultsGrid.innerHTML = "";
-
-      try {
-        let query = rawQuery;
-        const lowerQ = rawQuery.toLowerCase();
-        
-        if (lowerQ.includes('hand couch') || lowerQ === 'hand chair') {
-          query = 'hand chair';
-        }
-
-        const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
-        const data = await response.json();
-
-        if (loadingSpinner) loadingSpinner.classList.add("hidden");
-
-        allItems = data.shopping || [];
-
-        if (allItems.length === 0) {
-          if (noResults) noResults.classList.remove("hidden");
-          if (filterContainer) filterContainer.classList.add("hidden");
-        } else {
-          if (filterContainer) filterContainer.classList.remove("hidden");
-          applyFilter(currentFilter);
-        }
-      } catch (error) {
-        console.error("Search failed:", error);
-        if (loadingSpinner) loadingSpinner.classList.add("hidden");
-        if (noResults) noResults.classList.add("hidden");
+      if (lowerQ.includes('hand couch') || lowerQ === 'hand chair') {
+        query = 'hand chair';
       }
+
+      const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
+      const data = await response.json();
+
+      if (loadingSpinner) loadingSpinner.classList.add("hidden");
+
+      allItems = data.shopping || [];
+
+      if (allItems.length === 0) {
+        if (noResults) noResults.classList.remove("hidden");
+      } else {
+        applyFilter(currentFilter);
+      }
+    } catch (error) {
+      console.error("Search failed:", error);
+      if (loadingSpinner) loadingSpinner.classList.add("hidden");
+      if (noResults) noResults.classList.add("hidden");
+    }
+  }
+
+  if (searchForm) {
+    searchForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      performSearch(searchInput.value.trim());
     });
   }
 
-  // --- Filter & Sort Processor ---
+  // --- Filter & Trending Processor ---
   function applyFilter(type) {
     currentFilter = type;
     if (!allItems.length) return;
@@ -91,7 +140,11 @@ document.addEventListener("DOMContentLoaded", () => {
       return keywords.some(k => text.includes(k));
     };
 
-    if (type === 'low-to-high') {
+    if (type === 'trending') {
+      // Pick popular sources or items with reviews/ratings
+      filtered = filtered.filter(i => (i.rating || i.reviews) || textMatch(i, ['amazon', 'sephora', 'nike', 'nordstrom', 'target', 'viral']));
+      if (!filtered.length) filtered = [...allItems];
+    } else if (type === 'low-to-high') {
       filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
     } else if (type === 'high-to-low') {
       filtered.sort((a, b) => getNum(b.price) - getNum(a.price));
@@ -107,8 +160,10 @@ document.addEventListener("DOMContentLoaded", () => {
     } else if (type === 'used') {
       filtered = filtered.filter(i => isSecondHandStore(i.source) || textMatch(i, ['used', 'pre-owned', 'secondhand', 'vintage', 'refurbished']));
       filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
+    } else if (type === 'real') {
+      filtered = filtered.filter(i => textMatch(i, ['authentic', 'real', 'original', 'official', 'genuine']));
+      filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
     } else {
-      // Default: All Deals
       filtered.sort((a, b) => getNum(a.price) - getNum(b.price));
     }
 
@@ -134,14 +189,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const imageUrl = item.imageUrl || item.thumbnail || item.image || item.photo;
 
       let badgeHTML = '';
-      if (activeType === 'high-to-low') {
-        if (index === 0) {
-          badgeHTML = `
-            <div class="absolute -top-3 -right-2 bg-purple-600 text-white text-xs font-black px-3 py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
-              👑 HIGHEST PRICE
-            </div>
-          `;
-        }
+      if (activeType === 'trending' && index === 0) {
+        badgeHTML = `
+          <div class="absolute -top-3 -right-2 bg-orange-500 text-white text-xs font-black px-3 py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
+            🔥 TRENDING ITEM
+          </div>
+        `;
+      } else if (activeType === 'high-to-low' && index === 0) {
+        badgeHTML = `
+          <div class="absolute -top-3 -right-2 bg-purple-600 text-white text-xs font-black px-3 py-1 rounded-full border-2 border-slate-900 shadow-[2px_2px_0px_#1e293b] rotate-3 z-20">
+            👑 HIGHEST PRICE
+          </div>
+        `;
       } else {
         if (index === 0) {
           badgeHTML = `
