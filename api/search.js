@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  const { query } = req.query;
+  const { query, category, gender, size } = req.query;
 
   if (!query) {
     return res.status(400).json({ error: 'Query is required' });
@@ -11,40 +11,43 @@ export default async function handler(req, res) {
       'Content-Type': 'application/json'
     };
 
-    // Run 3 parallel fetches:
-    // 1. Standard search
-    // 2. High-end / luxury search
-    // 3. Explicit eBay & secondhand search to guarantee high volume of resale listings
-    const [standardRes, luxuryRes, ebayRes] = await Promise.all([
+    // Construct enriched search strings based on category, gender, and size
+    let extendedQuery = query;
+    if (gender) extendedQuery += ` ${gender}`;
+    if (category) extendedQuery += ` ${category}`;
+    if (size) extendedQuery += ` size ${size}`;
+
+    // Parallel searches to grab raw deals, cheap ebay listings, and luxury options
+    const [standardRes, ebayRes, cheapEbayRes] = await Promise.all([
       fetch(`https://google.serper.dev/shopping`, {
         method: 'POST',
         headers: serperHeaders,
-        body: JSON.stringify({ q: query, num: 100 })
+        body: JSON.stringify({ q: extendedQuery, num: 100 })
       }),
       fetch(`https://google.serper.dev/shopping`, {
         method: 'POST',
         headers: serperHeaders,
-        body: JSON.stringify({ q: `${query} luxury designer authentic`, num: 100 })
+        body: JSON.stringify({ q: `site:ebay.com ${extendedQuery}`, num: 100 })
       }),
+      // Cheap/Bargain query to force ultra-low prices like $5 items
       fetch(`https://google.serper.dev/shopping`, {
         method: 'POST',
         headers: serperHeaders,
-        body: JSON.stringify({ q: `site:ebay.com ${query}`, num: 100 })
+        body: JSON.stringify({ q: `site:ebay.com cheap deal ${extendedQuery}`, num: 100 })
       })
     ]);
 
     const standardData = await standardRes.json();
-    const luxuryData = await luxuryRes.json();
     const ebayData = await ebayRes.json();
+    const cheapEbayData = await cheapEbayRes.json();
 
-    const standardItems = standardData.shopping || [];
-    const luxuryItems = luxuryData.shopping || [];
-    const ebayItems = ebayData.shopping || [];
+    const combined = [
+      ...(standardData.shopping || []),
+      ...(ebayData.shopping || []),
+      ...(cheapEbayData.shopping || [])
+    ];
 
-    // Combine all 3 sources
-    const combined = [...standardItems, ...ebayItems, ...luxuryItems];
-
-    // Remove duplicates while preserving unique eBay links
+    // Deduplicate items by link or title
     const seenLinks = new Set();
     const uniqueItems = combined.filter(item => {
       const identifier = item.link || item.title;
