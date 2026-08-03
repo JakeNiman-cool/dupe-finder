@@ -1,17 +1,39 @@
-// Example backend route update in server.js
-app.get('/api/search', async (req, res) => {
+exports.handler = async (event, context) => {
   try {
-    const query = req.query.query || 'trending deals';
-    
-    // Call your shopping scraper / Google Shopping API wrapper with a high limit to get more items
-    const results = await fetchShoppingResults(query, { num: 40 }); 
+    // Get query parameters safely from Netlify's event object
+    const query = event.queryStringParameters?.query || 'trending deals';
+    console.log(`[Search API] Fetching deals for query: "${query}"`);
 
-    res.json({
-      success: true,
-      shopping: results || []
-    });
+    let results = [];
+    if (typeof fetchShoppingResults === 'function') {
+      results = await fetchShoppingResults(query, { num: 40 });
+    }
+
+    // Netlify functions must return an object with statusCode and stringified body
+    return {
+      statusCode: 200,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        success: true,
+        shopping: Array.isArray(results) ? results : []
+      })
+    };
   } catch (error) {
-    console.error("Search API Error:", error);
-    res.status(500).json({ success: false, shopping: [] });
+    console.error("[Search API Error]:", error);
+
+    // Always return valid JSON even during failures
+    return {
+      statusCode: 500,
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        success: false,
+        error: error.message || 'Internal server error',
+        shopping: []
+      })
+    };
   }
-});
+};
