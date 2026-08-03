@@ -1,15 +1,14 @@
 exports.handler = async (event, context) => {
   try {
-    // Get query parameters safely from Netlify's event object
     const query = event.queryStringParameters?.query || 'trending deals';
     console.log(`[Search API] Fetching deals for query: "${query}"`);
 
+    // Safe execution or fallback for shopping data
     let results = [];
     if (typeof fetchShoppingResults === 'function') {
       results = await fetchShoppingResults(query, { num: 40 });
     }
 
-    // Netlify functions must return an object with statusCode and stringified body
     return {
       statusCode: 200,
       headers: {
@@ -23,7 +22,7 @@ exports.handler = async (event, context) => {
   } catch (error) {
     console.error("[Search API Error]:", error);
 
-    // Always return valid JSON even during failures
+    // Forces clean JSON response instead of an HTML crash page
     return {
       statusCode: 500,
       headers: {
