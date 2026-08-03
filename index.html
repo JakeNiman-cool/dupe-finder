@@ -1,75 +1,125 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const searchForm = document.getElementById("search-form");
-  const searchInput = document.getElementById("search-input");
-  const loadingSpinner = document.getElementById("loading-spinner");
-  const noResults = document.getElementById("no-results");
-  const resultsGrid = document.getElementById("results-grid");
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DupeSpotter - Find Smart Product Alternatives</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Fun Cartoony Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body { font-family: 'Fredoka', sans-serif; }
+    .cartoony-card {
+      border: 3px solid #1e293b;
+      box-shadow: 4px 4px 0px #1e293b;
+      transition: all 0.2s ease-in-out;
+    }
+    .cartoony-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 6px 8px 0px #1e293b;
+    }
+    .cartoony-button {
+      border: 3px solid #1e293b;
+      box-shadow: 3px 3px 0px #1e293b;
+      transition: all 0.1s ease-in-out;
+    }
+    .cartoony-button:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px #1e293b;
+    }
+  </style>
+</head>
 
-  if (searchForm) {
-    searchForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const query = searchInput.value.trim();
-      
-      if (!query) return;
+<body class="bg-amber-50 text-slate-800 min-h-screen flex flex-col justify-between selection:bg-pink-400 selection:text-white">
 
-      if (loadingSpinner) loadingSpinner.classList.remove("hidden");
-      if (noResults) noResults.classList.add("hidden");
-      if (resultsGrid) resultsGrid.innerHTML = "";
+  <!-- Cute Background Blobs -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0 opacity-40">
+    <div class="absolute -top-20 -left-20 w-80 h-80 bg-pink-300 rounded-full blur-2xl"></div>
+    <div class="absolute top-1/4 -right-20 w-80 h-80 bg-purple-300 rounded-full blur-2xl"></div>
+    <div class="absolute bottom-10 left-1/3 w-80 h-80 bg-yellow-200 rounded-full blur-2xl"></div>
+  </div>
 
-      try {
-        const response = await fetch(`/api/search?query=${encodeURIComponent(query)}`);
-        const data = await response.json();
+  <!-- Navigation Header -->
+  <header class="bg-white/85 backdrop-blur-md border-b-4 border-slate-900 sticky top-0 z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-3xl font-bold tracking-tight text-pink-600 drop-shadow-[2px_2px_0px_#1e293b]">
+          ✨ DupeSpotter
+        </span>
+      </div>
+      <span class="text-xs bg-yellow-300 text-slate-900 border-2 border-slate-900 px-3 py-1 rounded-xl font-bold shadow-[2px_2px_0px_#1e293b]">
+        🎨 dbestguy productions
+      </span>
+    </div>
+  </header>
 
-        if (loadingSpinner) loadingSpinner.classList.add("hidden");
+  <!-- Main Content Area -->
+  <main class="max-w-6xl mx-auto px-4 py-12 w-full flex-grow relative z-10">
+    
+    <!-- Hero & Search Section -->
+    <div class="text-center max-w-2xl mx-auto mb-14">
+      <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight text-slate-900 mb-4 drop-shadow-[3px_3px_0px_#cbd5e1]">
+        Stop Overpaying! 🛍️ <br />
+        <span class="text-purple-600">Find Cute Dupes Fast.</span>
+      </h1>
+      <p class="text-slate-600 text-lg mb-8 font-medium">
+        Search any brand or product to uncover magical alternative deals!
+      </p>
 
-        const items = data.shopping || [];
-
-        if (items.length === 0) {
-          if (noResults) noResults.classList.remove("hidden");
-        } else {
-          renderResults(items);
-        }
-      } catch (error) {
-        console.error("Search failed:", error);
-        if (loadingSpinner) loadingSpinner.classList.add("hidden");
-        if (noResults) noResults.classList.remove("hidden");
-      }
-    });
-  }
-
-  function renderResults(items) {
-    if (!resultsGrid) return;
-    resultsGrid.innerHTML = "";
-
-    items.forEach((item) => {
-      const card = document.createElement("div");
-      card.className = "cartoony-card bg-white rounded-3xl p-5 flex flex-col justify-between";
-      
-      const imageUrl = item.imageUrl || item.thumbnail || item.image || item.photo;
-
-      const imageSection = imageUrl ? `
-        <div class="w-full h-48 bg-amber-100 rounded-2xl overflow-hidden mb-4 flex items-center justify-center p-2 border-2 border-slate-900">
-          <img src="${imageUrl}" alt="${item.title}" class="max-h-full max-w-full object-contain hover:scale-110 transition-transform duration-300" />
+      <!-- SEARCH FORM -->
+      <form id="search-form" class="relative max-w-xl mx-auto flex items-center">
+        <div class="relative w-full">
+          <input 
+            id="search-input"
+            type="text" 
+            placeholder="Search products (e.g. Panda Dunks, Perfume)..." 
+            required
+            autocomplete="off"
+            class="w-full px-6 py-4 pl-12 pr-36 bg-white border-4 border-slate-900 rounded-2xl text-slate-800 placeholder-slate-400 font-medium focus:outline-none focus:ring-4 focus:ring-purple-400 shadow-[4px_4px_0px_#1e293b] transition-all text-base"
+          />
+          <svg class="w-6 h-6 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
         </div>
-      ` : '';
+        <button 
+          type="submit" 
+          class="absolute right-2 px-6 py-3 bg-pink-500 hover:bg-pink-400 text-white font-bold rounded-xl cartoony-button text-base"
+        >
+          Search 🔍
+        </button>
+      </form>
+    </div>
 
-      card.innerHTML = `
-        <div>
-          ${imageSection}
-          <h3 class="font-bold text-slate-900 hover:text-pink-600 transition-colors mb-2 line-clamp-2 text-base">
-            <a href="${item.link}" target="_blank" rel="noopener noreferrer">${item.title}</a>
-          </h3>
-          <p class="text-pink-600 font-black text-xl mb-3">${item.price || ""}</p>
-        </div>
-        <div class="pt-4 border-t-2 border-slate-100 flex items-center justify-between text-xs">
-          <span class="bg-purple-100 text-purple-700 px-2.5 py-1 rounded-lg font-bold border border-slate-900 truncate max-w-[120px]">${item.source || "Store"}</span>
-          <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="cartoony-button px-4 py-2 bg-yellow-300 text-slate-900 rounded-xl font-bold text-xs hover:bg-yellow-400">
-            Grab Deal 🛒
-          </a>
-        </div>
-      `;
-      
-      resultsGrid.appendChild(card);
-    });
-  }
-});
+    <!-- Loading Spinner -->
+    <div id="loading-spinner" class="hidden flex flex-col items-center justify-center my-16">
+      <div class="w-14 h-14 border-4 border-slate-900 border-t-pink-500 rounded-full animate-spin mb-4 shadow-[3px_3px_0px_#1e293b]"></div>
+      <p class="text-slate-700 font-bold text-base">Hunting down sweet deals across the web... 🕵️‍♀️</p>
+    </div>
+
+    <!-- No Results Message -->
+    <div id="no-results" class="hidden text-center py-12 bg-white border-4 border-slate-900 rounded-3xl my-8 max-w-md mx-auto shadow-[6px_6px_0px_#1e293b]">
+      <div class="text-4xl mb-2">😿</div>
+      <h3 class="text-xl font-bold text-slate-900">No dupes found right now!</h3>
+      <p class="text-slate-600 text-sm mt-1 font-medium">Try searching for something a bit more general.</p>
+    </div>
+
+    <!-- Results Grid Container -->
+    <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t-4 border-slate-900 py-8 text-center text-sm font-bold text-slate-700 relative z-10">
+    <p>© 2026 DupeSpotter. Powered by Serper.dev & dbestguy productions 🚀</p>
+  </footer>
+
+  <!-- Main JS Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
