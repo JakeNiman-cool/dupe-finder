@@ -6,8 +6,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Append bargain search terms to ensure Google Shopping returns cheap deals & dupes
-    const searchQuery = `${query} dupe cheap alternative secondhand deal`;
+    // Target brand-new affordable dupes & alternatives instead of forcing secondhand listings
+    const searchQuery = `${query} affordable dupe lookalike alternative deal`;
 
     const response = await fetch(`https://google.serper.dev/shopping`, {
       method: 'POST',
