@@ -11,43 +11,52 @@ export default async function handler(req, res) {
       'Content-Type': 'application/json'
     };
 
-    // Construct enriched search strings based on category, gender, and size
-    let extendedQuery = query;
-    if (gender) extendedQuery += ` ${gender}`;
-    if (category) extendedQuery += ` ${category}`;
-    if (size) extendedQuery += ` size ${size}`;
+    // Clean exact specs from query so Google Shopping doesn't break
+    let cleanedQuery = query
+      .replace(/eur\s*\d+(\.\d+)?/gi, '')
+      .replace(/size\s*\d+(\.\d+)?/gi, '')
+      .replace(/uk\s*\d+(\.\d+)?/gi, '')
+      .replace(/us\s*\d+(\.\d+)?/gi, '')
+      .trim();
 
-    // Parallel searches to grab raw deals, cheap ebay listings, and luxury options
-    const [standardRes, ebayRes, cheapEbayRes] = await Promise.all([
+    if (!cleanedQuery) cleanedQuery = query;
+
+    let fullQuery = cleanedQuery;
+    if (gender) fullQuery += ` ${gender}`;
+    if (category) fullQuery += ` ${category}`;
+    if (size) fullQuery += ` size ${size}`;
+
+    // Parallel calls to grab general shopping + direct eBay listings
+    const [standardRes, ebayRes, directEbayRes] = await Promise.all([
       fetch(`https://google.serper.dev/shopping`, {
         method: 'POST',
         headers: serperHeaders,
-        body: JSON.stringify({ q: extendedQuery, num: 100 })
+        body: JSON.stringify({ q: fullQuery, num: 100 })
       }),
       fetch(`https://google.serper.dev/shopping`, {
         method: 'POST',
         headers: serperHeaders,
-        body: JSON.stringify({ q: `site:ebay.com ${extendedQuery}`, num: 100 })
+        body: JSON.stringify({ q: `site:ebay.com ${fullQuery}`, num: 100 })
       }),
-      // Cheap/Bargain query to force ultra-low prices like $5 items
+      // Raw string search to catch exact individual eBay listings
       fetch(`https://google.serper.dev/shopping`, {
         method: 'POST',
         headers: serperHeaders,
-        body: JSON.stringify({ q: `site:ebay.com cheap deal ${extendedQuery}`, num: 100 })
+        body: JSON.stringify({ q: `ebay ${query}`, num: 100 })
       })
     ]);
 
     const standardData = await standardRes.json();
     const ebayData = await ebayRes.json();
-    const cheapEbayData = await cheapEbayRes.json();
+    const directEbayData = await directEbayRes.json();
 
     const combined = [
-      ...(standardData.shopping || []),
       ...(ebayData.shopping || []),
-      ...(cheapEbayData.shopping || [])
+      ...(directEbayData.shopping || []),
+      ...(standardData.shopping || [])
     ];
 
-    // Deduplicate items by link or title
+    // Deduplicate by link or title
     const seenLinks = new Set();
     const uniqueItems = combined.filter(item => {
       const identifier = item.link || item.title;
