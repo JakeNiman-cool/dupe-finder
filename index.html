@@ -32,7 +32,7 @@
     }
   </style>
 </head>
-<body class="bg-amber-50 min-h-screen font-sans text-slate-900 pb-16">
+<body class="bg-pink-50 min-h-screen font-sans text-slate-900 pb-16">
 
   <!-- Header -->
   <header class="bg-white border-b-4 border-slate-900 py-4 mb-8 px-6">
@@ -75,39 +75,47 @@
     <!-- Main Grid: Sidebar + Results -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
       
-      <!-- Left Sidebar: Filter & Sort -->
-      <aside id="filter-container" class="hidden md:block bg-white p-6 rounded-3xl cartoony-card h-fit space-y-4">
-        <h2 class="text-xl font-black text-slate-900 mb-2 flex items-center gap-2">
+      <!-- Left Sidebar: Filter By -->
+      <aside id="filter-container" class="bg-white p-6 rounded-3xl cartoony-card h-fit space-y-4">
+        <h2 class="text-xl font-black text-slate-900 mb-4 flex items-center gap-2">
           ⚙️ Filter By
         </h2>
 
-        <!-- SORT OPTIONS -->
-        <div class="space-y-2">
-          <p class="text-xs font-black uppercase text-slate-400 tracking-wider">Sort Price</p>
-          <button data-filter="low-to-high" class="w-full text-left cartoony-button bg-yellow-300 hover:bg-yellow-400 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2 ring-4 ring-slate-900 scale-105">
+        <div class="space-y-3">
+          <!-- ORIGINAL CATEGORY BUTTONS -->
+          <button data-filter="all" class="w-full text-left cartoony-button bg-blue-500 text-white font-black px-4 py-3 rounded-2xl flex items-center gap-2 ring-4 ring-slate-900 scale-105">
+            <span class="w-5 h-5 rounded-full bg-white border-2 border-slate-900 flex items-center justify-center text-xs text-slate-900">✓</span>
+            All Deals
+          </button>
+
+          <button data-filter="low-to-high" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
             📉 Low to High
           </button>
-          <button data-filter="high-to-low" class="w-full text-left cartoony-button bg-purple-300 hover:bg-purple-400 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
+
+          <button data-filter="high-to-low" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
             📈 High to Low
           </button>
-        </div>
 
-        <hr class="border-t-2 border-slate-200 my-4" />
+          <button data-filter="new" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
+            ✨ Brand New
+          </button>
 
-        <!-- CATEGORY OPTIONS -->
-        <div class="space-y-2">
-          <p class="text-xs font-black uppercase text-slate-400 tracking-wider">Condition & Type</p>
-          <button data-filter="all" class="w-full text-left cartoony-button bg-blue-400 hover:bg-blue-500 text-white font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            🎯 All Deals
-          </button>
-          <button data-filter="dupe" class="w-full text-left cartoony-button bg-emerald-300 hover:bg-emerald-400 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            🪄 Cheap Alternative
-          </button>
-          <button data-filter="used" class="w-full text-left cartoony-button bg-pink-300 hover:bg-pink-400 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
+          <button data-filter="used" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
             ♻️ Used / Pre-Loved
           </button>
-          <button data-filter="new" class="w-full text-left cartoony-button bg-sky-300 hover:bg-sky-400 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
-            ✨ Brand New
+
+          <button data-filter="dupe" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
+            🪄 Cheap Alternative
+          </button>
+
+          <button data-filter="real" class="w-full text-left cartoony-button bg-white hover:bg-amber-50 text-slate-900 font-black px-4 py-3 rounded-2xl flex items-center gap-2">
+            <span class="w-5 h-5 rounded-full border-2 border-slate-900"></span>
+            💎 Authentic / Real
           </button>
         </div>
       </aside>
@@ -117,14 +125,14 @@
         <!-- Loading Spinner -->
         <div id="loading-spinner" class="hidden text-center py-16">
           <div class="inline-block animate-spin text-5xl mb-3">🌀</div>
-          <p class="text-xl font-black text-slate-700">Hunting down price options across all marketplaces...</p>
+          <p class="text-xl font-black text-slate-700">Hunting down prices across all store options...</p>
         </div>
 
         <!-- No Results State -->
         <div id="no-results" class="hidden text-center py-16 bg-white rounded-3xl cartoony-card max-w-md mx-auto">
           <div class="text-5xl mb-3">🛋️</div>
           <h3 class="text-2xl font-black mb-2">No Deals Found</h3>
-          <p class="text-slate-600 font-bold px-4">Try searching with simpler keywords!</p>
+          <p class="text-slate-600 font-bold px-4">Try searching with simpler terms!</p>
         </div>
 
         <!-- Product Cards Container -->
