@@ -26,37 +26,15 @@ export default async function handler(req, res) {
     if (category) fullQuery += ` ${category}`;
     if (size) fullQuery += ` size ${size}`;
 
-    // Safely fetch standard results AND specific Temu results side-by-side
-    const [standardRes, temuRes] = await Promise.all([
-      fetch(`https://google.serper.dev/shopping`, {
-        method: 'POST',
-        headers: serperHeaders,
-        body: JSON.stringify({ q: fullQuery, num: 60 })
-      }),
-      fetch(`https://google.serper.dev/shopping`, {
-        method: 'POST',
-        headers: serperHeaders,
-        body: JSON.stringify({ q: `site:temu.com ${fullQuery}`, num: 40 })
-      })
-    ]);
-
-    const standardData = await standardRes.json();
-    const temuData = await temuRes.json();
-
-    // Combine them safely (Temu items first so they show up prominently)
-    const combined = [
-      ...(temuData.shopping || []),
-      ...(standardData.shopping || [])
-    ];
-
-    // Deduplicate by link or title
-    const seenLinks = new Set();
-    const uniqueItems = combined.filter(item => {
-      const identifier = item.link || item.title;
-      if (seenLinks.has(identifier)) return false;
-      seenLinks.add(identifier);
-      return true;
+    // Single robust call with "temu" explicitly built into the search intent keyword
+    const response = await fetch(`https://google.serper.dev/shopping`, {
+      method: 'POST',
+      headers: serperHeaders,
+      body: JSON.stringify({ q: `${fullQuery} temu`, num: 100 })
     });
+
+    const data = await response.json();
+    const uniqueItems = data.shopping || [];
 
     return res.status(200).json({ shopping: uniqueItems });
   } catch (error) {
