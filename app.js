@@ -2,31 +2,28 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchForm = document.getElementById("search-form");
   const searchInput = document.getElementById("search-input");
   const genderSelect = document.getElementById("gender-select");
-  const sizeInput = document.getElementById("size-input");
+  const sizeSelect = document.getElementById("size-select");
   const loadingSpinner = document.getElementById("loading-spinner");
   const noResults = document.getElementById("no-results");
   const resultsGrid = document.getElementById("results-grid");
   const filterContainer = document.getElementById("filter-container");
   const recentTagsContainer = document.getElementById("recent-tags");
-  const vintedCategories = document.querySelectorAll("#vinted-categories button");
 
   let allItems = [];
   let currentFilter = 'all';
   let activeCategory = '';
 
-  // --- Vinted Category Clicks ---
-  vintedCategories.forEach(btn => {
-    btn.addEventListener("click", () => {
-      vintedCategories.forEach(b => b.classList.remove("text-pink-600", "underline"));
-      
-      btn.classList.add("text-pink-600", "underline");
+  // --- Size Hover Options Handler ---
+  document.querySelectorAll(".size-opt").forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const selectedSize = btn.dataset.size;
+      const selectedGender = btn.dataset.gender || '';
+      const selectedCat = btn.dataset.category || '';
 
-      if (btn.dataset.gender) {
-        if (genderSelect) genderSelect.value = btn.dataset.gender;
-      }
-      if (btn.dataset.category) {
-        activeCategory = btn.dataset.category;
-      }
+      if (genderSelect && selectedGender) genderSelect.value = selectedGender;
+      if (sizeSelect) sizeSelect.value = selectedSize;
+      if (selectedCat) activeCategory = selectedCat;
 
       if (searchInput.value.trim()) {
         performSearch(searchInput.value.trim());
@@ -109,7 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const gender = genderSelect ? genderSelect.value : '';
-      const size = sizeInput ? sizeInput.value.trim() : '';
+      const size = sizeSelect ? sizeSelect.value : '';
 
       const url = `/api/search?query=${encodeURIComponent(rawQuery)}&category=${encodeURIComponent(activeCategory)}&gender=${encodeURIComponent(gender)}&size=${encodeURIComponent(size)}`;
       
@@ -126,7 +123,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return match ? parseFloat(match[0]) : Infinity;
       }
 
-      // Default sort lowest to highest
       allItems.sort((a, b) => extractPrice(a.price) - extractPrice(b.price));
 
       if (allItems.length === 0) {
